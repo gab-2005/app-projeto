@@ -30,6 +30,11 @@ export default function RootLayout() {
       options = {{
         title: 'Página de Login'
       }} />
+      <Stack.Screen 
+      name= "home"
+      options = {{
+        title: 'Futuro home'
+      }} />
 
     </Stack>
 
