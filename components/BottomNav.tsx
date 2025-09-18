@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     paddingTop: 10,
     paddingBottom: 1,
-    height: 110,
+    height: 70,
   },
   tab: {
     alignItems: 'center',

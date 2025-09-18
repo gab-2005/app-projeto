@@ -1,12 +1,17 @@
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+/*npm install @react-navigation/stack*/
+import { View, Text, StyleSheet, StatusBar, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
 import BotaoCustomizado from '../../components/buttons';
 import BottomNav from '../../components/BottomNav';
+import { createStackNavigator } from "@react-navigation/stack";
 
 export default function TelaInicial() {
+  const Stack = createStackNavigator();
   return (
     <View style={styles.container}>
+
+      
       <StatusBar barStyle={'dark-content'} />
       
       <Text style={styles.text}>Bem-vindo(a) ao seu app!</Text>
