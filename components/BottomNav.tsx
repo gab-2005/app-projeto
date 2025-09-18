@@ -16,7 +16,7 @@ export default function BottomNav() {
 
   return (
     // Container do menu
-    <View style={[styles.container, { paddingBottom: insets.bottom || 10 }]}>
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       {tabs.map((tab) => {
         const active = pathname === tab.route;
         return (
@@ -47,10 +47,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // coloca os itens em linha
     justifyContent: 'space-around', // espaçamento igual
     alignItems: 'center',
-    height: 70,
     backgroundColor: '#ffffffff', // fundo escuro
-    borderTopWidth: 0.5,
-    borderTopColor: '#aaaaaaff',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: -2 },
+    shadowRadius: 4,
+    elevation: 3,
+    paddingTop: 10,
+    paddingBottom: 1,
+    height: 110,
   },
   tab: {
     alignItems: 'center',
