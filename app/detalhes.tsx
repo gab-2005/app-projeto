@@ -2,11 +2,14 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; 
 import React from 'react';
 import BotaoCustomizado from '@/components/buttons';
+import HeaderPerfil from '../components/HeaderPerfil';
+
 export default function TelaDetalhes() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
+      <HeaderPerfil />
       <Text style={styles.text}>Tela de Detalhes</Text>
       <BotaoCustomizado title="Voltar" onPress={() => router.back()} />
     </View>

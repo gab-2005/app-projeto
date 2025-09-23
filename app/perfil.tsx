@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import BottomNav from '../components/BottomNav';
+import HeaderPerfil from '../components/HeaderPerfil';
 
 export default function Perfil() {
   return (
     <View style={styles.container}>
+      <HeaderPerfil />
       {/* Conteúdo da Home */}
       <View style={styles.content}>
       </View>

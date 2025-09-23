@@ -1,38 +1,47 @@
-/*npm install @react-navigation/stack*/
-import { View, Text, StyleSheet, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import React from 'react';
 import BotaoCustomizado from '../../components/buttons';
 import BottomNav from '../../components/BottomNav';
-import { createStackNavigator } from "@react-navigation/stack";
+import HeaderPerfil from '../../components/HeaderPerfil';
 
 export default function TelaInicial() {
-  const Stack = createStackNavigator();
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      
-      <StatusBar barStyle={'dark-content'} />
-      
-      <Text style={styles.text}>Bem-vindo(a) ao seu app!</Text>
-      
-      <Link href="/detalhes" asChild>
-        <BotaoCustomizado title="Ir para Detalhes" onPress={() => {}} />
-      </Link>
+      {/* Header com saudação e avatar */}
+      <HeaderPerfil />
 
-      <Link href="/login" asChild>
-        <BotaoCustomizado title="Ir para o Login" onPress={() => {}} />
-      </Link>
+      {/* Conteúdo principal rolável */}
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Bem-vindo(a) ao seu app!</Text>
+        <Text style={styles.subtitle}>
+          Aqui você poderá explorar o mapa da faculdade e navegar pelas salas.
+        </Text>
 
-      <Link href="/cadastro" asChild>
-        <BotaoCustomizado title="Ir para o cadastro" onPress={() => {}} />
-      </Link>
+        <View style={styles.buttonsWrapper}>
+          <Link href="/detalhes" asChild>
+            <BotaoCustomizado title="Ir para Detalhes" />
+          </Link>
 
-      <Link href="/home" asChild>
-        <BotaoCustomizado title="Ir para o futuro home" onPress={() => {}} />
-      </Link>
+          <Link href="/login" asChild>
+            <BotaoCustomizado title="Ir para o Login" />
+          </Link>
 
-      {/* Nav Bar fixa no rodapé */}
+          <Link href="/cadastro" asChild>
+            <BotaoCustomizado title="Ir para o Cadastro" />
+          </Link>
+
+          <Link href="/home" asChild>
+            <BotaoCustomizado title="Ir para a Home" />
+          </Link>
+        </View>
+      </ScrollView>
+
       <BottomNav />
     </View>
   );
@@ -40,14 +49,33 @@ export default function TelaInicial() {
 
 const styles = StyleSheet.create({
   container: { 
-    flex: 1, 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    gap: 10,
-    paddingBottom: 80, // espaço extra para a BottomNav
+    flex: 1,
+    backgroundColor: '#F9F9F9',
   },
-  text: {
-    fontSize: 24, 
-    marginBottom: 16,
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
+  buttonsWrapper: {
+    width: '100%',
+    gap: 16,
+    alignItems: 'center',
   },
 });
