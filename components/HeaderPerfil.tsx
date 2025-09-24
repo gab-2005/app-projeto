@@ -1,16 +1,26 @@
 // components/HeaderPerfil.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface HeaderPerfilProps {
-  saudacao?: string; // Texto à esquerda, default "Olá Coruja"
+  saudacao?: string;
 }
 
 export default function HeaderPerfil({ saudacao = "Olá Coruja" }: HeaderPerfilProps) {
   const [image, setImage] = useState<string | null>(null);
 
-  // Função para abrir a galeria
+  // Carregar imagem salva ao iniciar
+  useEffect(() => {
+    const loadImage = async () => {
+      const savedImage = await AsyncStorage.getItem("@perfil_image");
+      if (savedImage) setImage(savedImage);
+    };
+    loadImage();
+  }, []);
+
+  // Função para abrir a galeria e salvar a imagem
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -20,7 +30,9 @@ export default function HeaderPerfil({ saudacao = "Olá Coruja" }: HeaderPerfilP
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setImage(uri);
+      await AsyncStorage.setItem("@perfil_image", uri); // salva a imagem
     }
   };
 
@@ -32,7 +44,7 @@ export default function HeaderPerfil({ saudacao = "Olá Coruja" }: HeaderPerfilP
           source={
             image
               ? { uri: image }
-              : require("../assets/images/perfil.png") // imagem padrão
+              : require("../assets/images/perfil.png")
           }
           style={styles.avatar}
         />
@@ -50,8 +62,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
-    elevation: 3, // sombra no Android
-    shadowColor: "#000", // sombra iOS
+    elevation: 3,
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,

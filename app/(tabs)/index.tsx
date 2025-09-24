@@ -1,21 +1,25 @@
-import { View, Text, StyleSheet, StatusBar, ScrollView } from 'react-native';
-import { Link } from 'expo-router';
+// app/index.tsx
 import React from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { Link } from 'expo-router';
 import BotaoCustomizado from '../../components/buttons';
 import BottomNav from '../../components/BottomNav';
 import HeaderPerfil from '../../components/HeaderPerfil';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TelaInicial() {
+  const insets = useSafeAreaInsets(); // Para lidar com notch/barra de gesto
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Header com saudação e avatar */}
+      {/* Header fixo */}
       <HeaderPerfil />
 
-      {/* Conteúdo principal rolável */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+      {/* Conteúdo rolável */}
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 20 }]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Bem-vindo(a) ao seu app!</Text>
@@ -42,13 +46,16 @@ export default function TelaInicial() {
         </View>
       </ScrollView>
 
-      <BottomNav />
-    </View>
+      {/* BottomNav fixo no final */}
+      <View style={{ paddingBottom: insets.bottom }}>
+        <BottomNav />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  safeArea: {
     flex: 1,
     backgroundColor: '#F9F9F9',
   },
@@ -57,7 +64,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 100,
   },
   title: {
     fontSize: 28,

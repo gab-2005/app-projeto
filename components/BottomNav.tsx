@@ -2,11 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; // importa hook para lidar com notch/barras de gesto
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const insets = useSafeAreaInsets(); // pega os espaços seguros do dispositivo
 
   const tabs = [
     { name: 'Home', icon: 'home-outline', route: '/' },
@@ -15,8 +13,7 @@ export default function BottomNav() {
   ];
 
   return (
-    // Container do menu
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View style={styles.container}>
       {tabs.map((tab) => {
         const active = pathname === tab.route;
         return (
@@ -26,7 +23,7 @@ export default function BottomNav() {
                 name={active ? tab.icon.replace('-outline', '') : tab.icon}
                 size={24}
                 color={active ? '#917AFD' : '#727272ff'}
-                />
+              />
               <Text style={[styles.label, active && styles.activeLabel]}>
                 {tab.name}
               </Text>
@@ -40,34 +37,33 @@ export default function BottomNav() {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute', // fixa no rodapé
+    position: 'absolute', // mantém no rodapé
     left: 0,
     right: 0,
     bottom: 0,
-    flexDirection: 'row', // coloca os itens em linha
-    justifyContent: 'space-around', // espaçamento igual
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#ffffffff', // fundo escuro
+    backgroundColor: '#ffffffff',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: -2 },
     shadowRadius: 4,
-    elevation: 3,
-    paddingTop: 10,
-    paddingBottom: 1,
-    height: 70,
+    elevation: 0,
+    paddingTop: 0,
+    height: 70, // define a altura exata
   },
   tab: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   label: {
-    color: '#727272ff', // cor padrão do texto
+    color: '#727272ff',
     fontSize: 12,
     marginTop: 2,
   },
   activeLabel: {
-    color: '#917AFD', // cor do texto ativo
+    color: '#917AFD',
     fontWeight: 'bold',
   },
 });
