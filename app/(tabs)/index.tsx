@@ -1,4 +1,4 @@
-// app/index.tsx
+
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { Link } from 'expo-router';
@@ -7,8 +7,10 @@ import BottomNav from '../../components/BottomNav';
 import HeaderPerfil from '../../components/HeaderPerfil';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
 export default function TelaInicial() {
   const insets = useSafeAreaInsets(); // Para lidar com notch/barra de gesto
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -58,6 +60,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#F9F9F9',
+    
   },
   scrollContent: {
     flexGrow: 1,

@@ -1,80 +1,126 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Switch, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  Switch,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Animated,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import BottomNav from '../../components/BottomNav';
 import { useAppTheme } from '../../components/ThemeContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useAvatar } from '../../hooks/useAvatar';
 
 export default function TelaPerfil() {
-  const [email] = useState("usuario@email.com"); 
-  const [avatar, setAvatar] = useState(require("../../assets/images/perfil.png")); 
-  const { isDark, toggleTheme } = useAppTheme(); 
+  const [email] = useState("usuario@email.com");
+  const { isDark, toggleTheme } = useAppTheme();
   const insets = useSafeAreaInsets();
+  const { avatar, pickImage } = useAvatar();
 
-  useEffect(() => {
-    const loadAvatar = async () => {
-      try {
-        const savedAvatar = await AsyncStorage.getItem('@avatar_uri');
-        if (savedAvatar) setAvatar({ uri: savedAvatar });
-      } catch (e) {
-        console.log("Erro ao carregar avatar:", e);
-      }
+  const OptionItem = ({ icon, label, color = "#fff", rightElement, onPress }) => {
+    const scaleAnim = new Animated.Value(1);
+
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.96,
+        useNativeDriver: true,
+      }).start();
     };
-    loadAvatar();
-  }, []);
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+    const handlePressOut = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        useNativeDriver: true,
+      }).start();
+      if (onPress) onPress();
+    };
 
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setAvatar({ uri });
-      await AsyncStorage.setItem('@avatar_uri', uri);
-    }
+    return (
+      <Animated.View style={{ transform: [{ scale: scaleAnim }], width: '100%' }}>
+        <TouchableOpacity
+          style={styles.optionRow}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={0.7}
+        >
+          <View style={styles.optionLeft}>
+            <Ionicons name={icon} size={22} color={color} style={{ marginRight: 10 }} />
+            <Text style={[styles.optionText, { color }]}>{label}</Text>
+          </View>
+          {rightElement && rightElement}
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair da Conta",
+      "Tem certeza que deseja sair?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Sair", style: "destructive", onPress: () => console.log("Usuário saiu") },
+      ]
+    );
   };
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
       <LinearGradient
-        colors={isDark ? ['#222', '#555'] : ['#9560e1', '#005c83']}
+        colors={isDark ? ['#141414', '#2c2c2c'] : ['#7e57c2', '#0097a7']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <TouchableOpacity onPress={pickImage}>
-            <Image source={avatar} style={styles.avatar} />
+
+        {/* Cabeçalho */}
+        <View style={styles.header}>
+          <TouchableOpacity>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Perfil</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          
+          {/* Avatar */}
+          <View style={styles.avatarWrapper}>
+            <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+              <LinearGradient colors={['#fff', '#bbb']} style={styles.avatarBorder}>
+                <Image source={avatar} style={styles.avatar} />
+              </LinearGradient>
+              <View style={styles.cameraIcon}>
+                <Ionicons name="camera" size={18} color="#fff" />
+              </View>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.email}>{email}</Text>
 
-          <View style={styles.optionRow}>
-            <Text style={styles.optionText}>Modo Escuro</Text>
-            <Switch value={isDark} onValueChange={toggleTheme} />
-          </View>
+          {/* Opções */}
+          <OptionItem
+            icon="moon"
+            label="Modo Escuro"
+            rightElement={<Switch value={isDark} onValueChange={toggleTheme} />}
+          />
+          <OptionItem icon="person-circle-outline" label="Informações Pessoais" />
+          <OptionItem icon="eye-outline" label="Acessibilidade" />
+          <OptionItem icon="settings-outline" label="Configurações" />
+          <OptionItem
+            icon="log-out-outline"
+            label="Sair da Conta"
+            color="red"
+            onPress={handleLogout}
+          />
 
-          <TouchableOpacity style={styles.optionRow}>
-            <Text style={styles.optionText}>Informações Pessoais</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.optionRow}>
-            <Text style={styles.optionText}>Acessibilidade</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.optionRow}>
-            <Text style={styles.optionText}>Configuração</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.optionRow}>
-            <Text style={[styles.optionText, { color: 'red' }]}>Sair da Conta</Text>
-          </TouchableOpacity>
         </ScrollView>
 
         <BottomNav />
@@ -85,34 +131,63 @@ export default function TelaPerfil() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+  },
   scrollContent: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 30,
+  },
+  avatarWrapper: {
+    marginBottom: 15,
+  },
+  avatarBorder: {
+    padding: 3,
+    borderRadius: 55,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: '#fff',
-    marginBottom: 10,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#0008',
+    borderRadius: 20,
+    padding: 5,
   },
   email: {
     fontSize: 16,
     color: '#fff',
-    marginBottom: 20,
+    marginBottom: 25,
+    fontWeight: '500',
   },
   optionRow: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    marginVertical: 5,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    marginVertical: 6,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  optionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   optionText: {
     fontSize: 16,

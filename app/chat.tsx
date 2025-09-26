@@ -1,33 +1,41 @@
+
 import React from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { Link } from 'expo-router';
+import BotaoCustomizado from '../components/buttons';
 import BottomNav from '../components/BottomNav';
 import HeaderPerfil from '../components/HeaderPerfil';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function Chat() {
+
+export default function TelaInicial() {
+  const insets = useSafeAreaInsets(); // Para lidar com notch/barra de gesto
+
+
   return (
-    
-    
-    <View style={styles.container}>
-      <HeaderPerfil />
-      {/* Conteúdo da Home */}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
 
-      <View style={styles.content}>
+      {/* Header fixo */}
+      <HeaderPerfil />
+
+      {/* Conteúdo rolável */}
+      <ScrollView>
+
+      </ScrollView>
+
+      {/* BottomNav fixo no final */}
+      <View style={{ paddingBottom: insets.bottom }}>
+        <BottomNav />
       </View>
-      {/* Barra de navegação fixa */}
-      <BottomNav />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,               // ESSENCIAL: ocupa toda a tela
-    backgroundColor: '#ffffffff',
-    
-  },
-  content: {
-     backgroundColor: '#ffffffff',
+  safeArea: {
     flex: 1,
-    paddingBottom: 70,     // espaço reservado para a nav
+    backgroundColor: '#F9F9F9',
+    
   },
 });

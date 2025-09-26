@@ -2,6 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
+
+
+const statusBarBottom = Constants.statusBarBottom;
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -47,11 +51,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffff',
     shadowColor: '#000',
     shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: -2 },
     shadowRadius: 4,
     elevation: 0,
     paddingTop: 0,
     height: 70, // define a altura exata
+    marginBottom : statusBarBottom,
   },
   tab: {
     alignItems: 'center',
