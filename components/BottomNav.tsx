@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Link, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import { Link, usePathname } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
 const statusBarBottom = Constants.statusBarBottom;
@@ -12,6 +12,7 @@ export default function BottomNav() {
 
   const tabs = [
     { name: 'Home', icon: 'home-outline', route: '/' },
+    { name: 'Mapa', icon: 'map-outline', route: '/mapa' },
     { name: 'Chat', icon: 'chatbubble-ellipses-outline', route: '/chat' },
     { name: 'Perfil', icon: 'person-outline', route: '/perfil' },
   ];

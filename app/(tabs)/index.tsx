@@ -30,10 +30,6 @@ export default function TelaInicial() {
         </Text>
 
         <View style={styles.buttonsWrapper}>
-          <Link href="/mapa" asChild>
-            <BotaoCustomizado title="🗺️ Mapa Unisuam" />
-          </Link>
-
           <Link href="/detalhes" asChild>
             <BotaoCustomizado title="Ir para Detalhes" />
           </Link>

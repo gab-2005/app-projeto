@@ -4,7 +4,6 @@ import {
     Animated,
     Dimensions,
     ImageBackground,
-    SafeAreaView,
     StatusBar,
     StyleSheet,
     Text,
@@ -12,6 +11,8 @@ import {
     View,
 } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomNav from '../components/BottomNav';
 import MapMarker from '../components/MapMarker';
 import SearchBar from '../components/SearchBar';
 
@@ -87,6 +88,13 @@ const getSalaColor = (nome: string): string => {
 export default function MapaScreen() {
   const [highlightedSala, setHighlightedSala] = useState<Sala | null>(null);
   const [searchResult, setSearchResult] = useState<Sala | null>(null);
+  
+  // Safe area insets para garantir que o layout não fique atrás dos ícones do sistema
+  const insets = useSafeAreaInsets();
+  
+  // Garantir que os insets sejam sempre positivos
+  const safeTop = Math.max(insets.top, 20);
+  const safeBottom = Math.max(insets.bottom, 10);
   
   // Animações para zoom e pan
   const scale = useRef(new Animated.Value(1)).current;
@@ -176,7 +184,7 @@ export default function MapaScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: safeTop, paddingBottom: safeBottom }]}>
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
       
       {/* Header */}
@@ -248,42 +256,26 @@ export default function MapaScreen() {
 
 
       {/* Indicador de Zoom */}
-      <View style={styles.zoomIndicator}>
+      <View style={[styles.zoomIndicator, { top: safeTop + 10 }]}>
         <Animated.Text style={styles.zoomText}>
           {Math.round(baseScale.current * 100)}%
         </Animated.Text>
       </View>
 
-      {/* Instruções de Gestos */}
-      <View style={styles.gestureInstructions}>
-        <Text style={styles.instructionText}>
-          📌 Use dois dedos para dar zoom
-        </Text>
-        <Text style={styles.instructionText}>
-          👆 Arraste para mover o mapa
-        </Text>
-      </View>
 
       {/* Botão para limpar seleção */}
       {highlightedSala && (
-        <TouchableOpacity style={styles.clearSelectionButton} onPress={() => setHighlightedSala(null)}>
+        <TouchableOpacity style={[styles.clearSelectionButton, { bottom: safeBottom + 150 }]} onPress={() => setHighlightedSala(null)}>
           <Ionicons name="close-circle" size={20} color="#fff" />
           <Text style={styles.clearSelectionText}>Limpar seleção</Text>
         </TouchableOpacity>
       )}
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Desenvolvido por Gabriel — ADS Unisuam
-        </Text>
+      {/* BottomNav fixo no final */}
+      <View style={{ paddingBottom: safeBottom }}>
+        <BottomNav />
       </View>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity style={styles.fab} onPress={resetMap}>
-        <Ionicons name="home" size={24} color="#fff" />
-      </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -296,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 16,
     backgroundColor: '#fff',
     shadowColor: '#000',
@@ -309,10 +301,11 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: '#333',
     flex: 1,
+    flexShrink: 1,
   },
   resetButton: {
     backgroundColor: '#00FFFF',
@@ -328,7 +321,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   searchContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
@@ -360,39 +353,23 @@ const styles = StyleSheet.create({
   },
   zoomIndicator: {
     position: 'absolute',
-    left: 20,
-    top: 20,
+    left: 10,
+    top: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    maxWidth: width - 20,
   },
   zoomText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
   },
-  gestureInstructions: {
-    position: 'absolute',
-    bottom: 100,
-    left: 20,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-  },
-  instructionText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-    textAlign: 'center',
-    marginVertical: 2,
-  },
   clearSelectionButton: {
     position: 'absolute',
     bottom: 150,
-    right: 20,
+    right: 10,
     backgroundColor: '#FF4444',
     borderRadius: 20,
     paddingHorizontal: 12,
@@ -407,40 +384,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+    maxWidth: width - 20,
   },
   clearSelectionText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,
-  },
-  footer: {
-    backgroundColor: '#333',
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  footerText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    backgroundColor: '#00FFFF',
-    borderRadius: 28,
-    width: 56,
-    height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#00FFFF',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
 });
