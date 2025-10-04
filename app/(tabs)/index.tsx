@@ -1,11 +1,11 @@
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { Link } from 'expo-router';
-import BotaoCustomizado from '../../components/buttons';
-import BottomNav from '../../components/BottomNav';
-import HeaderPerfil from '../../components/HeaderPerfil';
+import React from 'react';
+import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomNav from '../../components/BottomNav';
+import BotaoCustomizado from '../../components/buttons';
+import HeaderPerfil from '../../components/HeaderPerfil';
 
 
 export default function TelaInicial() {
@@ -30,6 +30,10 @@ export default function TelaInicial() {
         </Text>
 
         <View style={styles.buttonsWrapper}>
+          <Link href="/mapa" asChild>
+            <BotaoCustomizado title="🗺️ Mapa Unisuam" />
+          </Link>
+
           <Link href="/detalhes" asChild>
             <BotaoCustomizado title="Ir para Detalhes" />
           </Link>
@@ -40,10 +44,6 @@ export default function TelaInicial() {
 
           <Link href="/cadastro" asChild>
             <BotaoCustomizado title="Ir para o Cadastro" />
-          </Link>
-
-          <Link href="/home" asChild>
-            <BotaoCustomizado title="Ir para a Home" />
           </Link>
         </View>
       </ScrollView>

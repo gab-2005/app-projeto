@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app-navegacao",
-    "slug": "app-navegacao",
+    "name": "Mapa Unisuam",
+    "slug": "mapa-unisuam",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

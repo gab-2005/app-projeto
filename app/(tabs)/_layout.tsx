@@ -1,6 +1,6 @@
 // app/_layout.tsx
-import React from "react";
 import { Stack } from "expo-router";
+import React from "react";
 import { AppThemeProvider } from "../../components/ThemeContext";
 
 export default function RootLayout() {
