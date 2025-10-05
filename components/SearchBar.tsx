@@ -82,7 +82,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+          <Ionicons name="search" size={20} color="#667eea" style={styles.searchIcon} />
           <TextInput
             style={styles.input}
             placeholder="Digite o nome da sala..."
@@ -96,7 +96,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
           />
           {searchText.length > 0 && (
             <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-              <Ionicons name="close-circle" size={20} color="#666" />
+              <Ionicons name="close-circle" size={20} color="#667eea" />
             </TouchableOpacity>
           )}
         </View>
@@ -116,7 +116,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
                 style={styles.suggestionItem}
                 onPress={() => handleSuggestionPress(item)}
               >
-                <Ionicons name="location" size={16} color="#00FFFF" />
+                <Ionicons name="location" size={16} color="#667eea" />
                 <Text style={styles.suggestionText}>{item.nome}</Text>
               </TouchableOpacity>
             )}
@@ -133,55 +133,61 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    zIndex: 20,
+    zIndex: 200,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    shadowColor: '#000',
+    borderRadius: 30,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    shadowColor: '#667eea',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 6,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(102, 126, 234, 0.2)',
   },
   inputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 10,
+    color: '#667eea',
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: '#2d3748',
+    fontWeight: '500',
   },
   clearButton: {
-    padding: 4,
+    padding: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(102, 126, 234, 0.1)',
   },
   searchButton: {
-    backgroundColor: '#00FFFF',
-    borderRadius: 20,
-    padding: 12,
+    backgroundColor: '#667eea',
+    borderRadius: 24,
+    padding: 10,
     marginLeft: 8,
-    shadowColor: '#00FFFF',
+    shadowColor: '#667eea',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   suggestionsContainer: {
     position: 'absolute',
@@ -189,18 +195,20 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    marginTop: 4,
-    shadowColor: '#000',
+    borderRadius: 16,
+    marginTop: 8,
+    shadowColor: '#667eea',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 12,
     maxHeight: 200,
-    zIndex: 30,
+    zIndex: 300,
+    borderWidth: 1,
+    borderColor: 'rgba(102, 126, 234, 0.1)',
   },
   suggestionsList: {
     maxHeight: 200,
@@ -208,15 +216,16 @@ const styles = StyleSheet.create({
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: 'rgba(102, 126, 234, 0.1)',
   },
   suggestionText: {
-    marginLeft: 8,
+    marginLeft: 10,
     fontSize: 16,
-    color: '#333',
+    color: '#2d3748',
+    fontWeight: '500',
   },
 });
 
