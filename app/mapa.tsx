@@ -13,81 +13,132 @@ import {
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
-import MapMarker from '../components/MapMarker';
+import HeaderPerfil from '../components/HeaderPerfil';
 import SearchBar from '../components/SearchBar';
 
 const { width, height } = Dimensions.get('window');
 
 interface Sala {
   nome: string;
-  x: number;
-  y: number;
+  imagem: string;
 }
 
-// Dados das salas do primeiro andar - Coordenadas enquadradas na imagem
+// Dados das salas - todas usando mapa1.png por enquanto
 const salas: Sala[] = [
-  // Salas C (101c a 105c) - Linha superior centralizada
-  { nome: "Sala 101C", x: 0.130, y: 0.420 },
-  { nome: "Sala 102C", x: 0.190, y: 0.420 },
-  { nome: "Sala 103C", x: 0.245, y: 0.420},
-  { nome: "Sala 104C", x: 0.300, y: 0.420},
-  { nome: "Sala 105C", x: 0.365, y: 0.420},
+  // Salas C (101c a 105c)
+  { nome: "Sala 101C", imagem: "mapa1.png" },
+  { nome: "Sala 102C", imagem: "mapa1.png" },
+  { nome: "Sala 103C", imagem: "mapa1.png" },
+  { nome: "Sala 104C", imagem: "mapa1.png" },
+  { nome: "Sala 105C", imagem: "mapa1.png" },
   
-  // Salas D (101d a 109d) - Linha média centralizada
-  { nome: "Sala 101D", x: 0.69, y: 0.42 },
-  { nome: "Sala 102D", x: 0.69, y: 0.50 },
-  { nome: "Sala 103D", x: 0.35, y: 0.45 },
-  { nome: "Sala 104D", x: 0.45, y: 0.45 },
-  { nome: "Sala 105D", x: 0.55, y: 0.45 },
-  { nome: "Sala 106D", x: 0.65, y: 0.45 },
-  { nome: "Sala 107D", x: 0.75, y: 0.45 },
-  { nome: "Sala 108D", x: 0.85, y: 0.45 },
-  { nome: "Sala 109D", x: 0.95, y: 0.45 },
+  // Salas D (101d a 109d)
+  { nome: "Sala 101D", imagem: "mapa1.png" },
+  { nome: "Sala 102D", imagem: "mapa1.png" },
+  { nome: "Sala 103D", imagem: "mapa1.png" },
+  { nome: "Sala 104D", imagem: "mapa1.png" },
+  { nome: "Sala 105D", imagem: "mapa1.png" },
+  { nome: "Sala 106D", imagem: "mapa1.png" },
+  { nome: "Sala 107D", imagem: "mapa1.png" },
+  { nome: "Sala 108D", imagem: "mapa1.png" },
+  { nome: "Sala 109D", imagem: "mapa1.png" },
   
-  // Salas E (101e a 110e) - Linha inferior centralizada
-  { nome: "Sala 101E", x: 0.1, y: 0.65 },
-  { nome: "Sala 102E", x: 0.2, y: 0.65 },
-  { nome: "Sala 103E", x: 0.3, y: 0.65 },
-  { nome: "Sala 104E", x: 0.4, y: 0.65 },
-  { nome: "Sala 105E", x: 0.5, y: 0.65 },
-  { nome: "Sala 106E", x: 0.6, y: 0.65 },
-  { nome: "Sala 107E", x: 0.7, y: 0.65 },
-  { nome: "Sala 108E", x: 0.8, y: 0.65 },
-  { nome: "Sala 109E", x: 0.9, y: 0.65 },
-  { nome: "Sala 110E", x: 0.95, y: 0.65 },
+  // Salas E (101e a 110e)
+  { nome: "Sala 101E", imagem: "mapa1.png" },
+  { nome: "Sala 102E", imagem: "mapa1.png" },
+  { nome: "Sala 103E", imagem: "mapa1.png" },
+  { nome: "Sala 104E", imagem: "mapa1.png" },
+  { nome: "Sala 105E", imagem: "mapa1.png" },
+  { nome: "Sala 106E", imagem: "mapa1.png" },
+  { nome: "Sala 107E", imagem: "mapa1.png" },
+  { nome: "Sala 108E", imagem: "mapa1.png" },
+  { nome: "Sala 109E", imagem: "mapa1.png" },
+  { nome: "Sala 110E", imagem: "mapa1.png" },
   
-  // Áreas especiais - Parte inferior centralizada
-  { nome: "Biblioteca", x: 0.75, y: 0.85 },
-  { nome: "Auditório", x: 0.5, y: 0.85 },
-  { nome: "Banheiro", x: 0.25, y: 0.85 },
+  // Áreas especiais
+  { nome: "Biblioteca", imagem: "mapa1.png" },
+  { nome: "Auditório", imagem: "mapa1.png" },
+  { nome: "Banheiro", imagem: "mapa1.png" },
 ];
 
-// Função para obter cor baseada no nome da sala
-const getSalaColor = (nome: string): string => {
-  if (nome.includes('101C') || nome.includes('102C') || nome.includes('103C') || nome.includes('104C') || nome.includes('105C')) {
-    return '#00FFFF'; // Salas C - Ciano
+// Função para obter a imagem correta
+const getImageSource = (imageName: string) => {
+  switch (imageName) {
+    // Imagem padrão
+    case 'mapa1.png':
+      return require('../assets/images/mapa1.png');
+    
+    // Salas C - por enquanto todas usam mapa1.png
+    case 'sala101c.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala102c.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala103c.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala104c.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala105c.png':
+      return require('../assets/images/mapa1.png');
+    
+    // Salas D - por enquanto todas usam mapa1.png
+    case 'sala101d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala102d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala103d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala104d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala105d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala106d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala107d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala108d.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala109d.png':
+      return require('../assets/images/mapa1.png');
+    
+    // Salas E - por enquanto todas usam mapa1.png
+    case 'sala101e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala102e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala103e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala104e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala105e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala106e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala107e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala108e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala109e.png':
+      return require('../assets/images/mapa1.png');
+    case 'sala110e.png':
+      return require('../assets/images/mapa1.png');
+    
+    // Áreas especiais - por enquanto todas usam mapa1.png
+    case 'biblioteca.png':
+      return require('../assets/images/mapa1.png');
+    case 'auditorio.png':
+      return require('../assets/images/mapa1.png');
+    case 'banheiro.png':
+      return require('../assets/images/mapa1.png');
+    
+    default:
+      return require('../assets/images/mapa1.png');
   }
-  if (nome.includes('101D') || nome.includes('102D') || nome.includes('103D') || nome.includes('104D') || nome.includes('105D') || nome.includes('106D') || nome.includes('107D') || nome.includes('108D') || nome.includes('109D')) {
-    return '#4CAF50'; // Salas D - Verde
-  }
-  if (nome.includes('101E') || nome.includes('102E') || nome.includes('103E') || nome.includes('104E') || nome.includes('105E') || nome.includes('106E') || nome.includes('107E') || nome.includes('108E') || nome.includes('109E') || nome.includes('110E')) {
-    return '#FF9800'; // Salas E - Laranja
-  }
-  if (nome.includes('Biblioteca')) {
-    return '#2196F3'; // Biblioteca - Azul
-  }
-  if (nome.includes('Auditório')) {
-    return '#F44336'; // Auditório - Vermelho
-  }
-  if (nome.includes('Banheiro')) {
-    return '#9C27B0'; // Banheiro - Roxo
-  }
-  return '#00BCD4'; // Cor padrão
 };
 
+
 export default function MapaScreen() {
-  const [highlightedSala, setHighlightedSala] = useState<Sala | null>(null);
-  const [searchResult, setSearchResult] = useState<Sala | null>(null);
+  const [selectedSala, setSelectedSala] = useState<Sala | null>(null);
+  const [currentImage, setCurrentImage] = useState<string>("mapa1.png");
   
   // Safe area insets para garantir que o layout não fique atrás dos ícones do sistema
   const insets = useSafeAreaInsets();
@@ -110,28 +161,33 @@ export default function MapaScreen() {
   const focalX = useRef(0);
   const focalY = useRef(0);
   
-  // Configurações otimizadas
-  const MIN_ZOOM = 0.5; // Zoom mínimo para não bagunçar layout
-  const MAX_ZOOM = 3.0; // Zoom máximo controlado
-  const RESET_THRESHOLD = 0.6; // Retorna quando expandir demais
-  const ZOOM_OUT_THRESHOLD = 0.9; // Retorna quando afastar (zoom out) demais
+  // Configurações otimizadas para melhor controle
+  const MIN_ZOOM = 0.8; // Zoom mínimo mais restritivo
+  const MAX_ZOOM = 2.5; // Zoom máximo mais controlado
+  const RESET_THRESHOLD = 0.85; // Retorna quando expandir demais
+  const ZOOM_OUT_THRESHOLD = 0.9; // Retorna quando afastar demais
+
+
+
+
+
   
-  // Função para calcular limites rigorosos da tela
+  // Função para calcular limites rigorosos da tela - melhorada para evitar sair da tela
   const getScreenLimits = (currentScale: number) => {
     const imageWidth = width;
-    const imageHeight = height * 0.6;
+    const imageHeight = height * 0.7; // Ajustado para nova altura
     const scaledWidth = imageWidth * currentScale;
     const scaledHeight = imageHeight * currentScale;
     
     // Calcular limites para manter imagem sempre visível
     const maxTranslateX = Math.max(0, (scaledWidth - width) / 2);
-    const maxTranslateY = Math.max(0, (scaledHeight - height * 0.6) / 2);
+    const maxTranslateY = Math.max(0, (scaledHeight - height * 0.7) / 2);
     
-    // Limites mais rigorosos - sempre manter parte do mapa visível
-    const strictMinX = Math.min(-maxTranslateX, -width * 0.3); // Máximo 30% da tela para fora
-    const strictMaxX = Math.max(maxTranslateX, width * 0.3);   // Máximo 30% da tela para fora
-    const strictMinY = Math.min(-maxTranslateY, -height * 0.2); // Máximo 20% da tela para fora
-    const strictMaxY = Math.max(maxTranslateY, height * 0.2);   // Máximo 20% da tela para fora
+    // Limites mais rigorosos - sempre manter o mapa visível
+    const strictMinX = Math.min(-maxTranslateX, -width * 0.15); // Máximo 15% da tela para fora
+    const strictMaxX = Math.max(maxTranslateX, width * 0.15);   // Máximo 15% da tela para fora
+    const strictMinY = Math.min(-maxTranslateY, -height * 0.1); // Máximo 10% da tela para fora
+    const strictMaxY = Math.max(maxTranslateY, height * 0.1);   // Máximo 10% da tela para fora
     
     return {
       minX: strictMinX,
@@ -142,13 +198,12 @@ export default function MapaScreen() {
   };
 
   const handleSearch = (sala: Sala | null) => {
-    setSearchResult(sala);
     if (sala) {
-      setHighlightedSala(sala);
-      // Apenas marcar a sala (sem movimento da tela)
-      // A sala ficará destacada permanentemente
+      setSelectedSala(sala);
+      setCurrentImage(sala.imagem);
     } else {
-      setHighlightedSala(null);
+      setSelectedSala(null);
+      setCurrentImage("mapa1.png");
     }
   };
 
@@ -181,23 +236,19 @@ export default function MapaScreen() {
     ]).start();
   };
 
-  const handleSalaSelect = (sala: Sala) => {
-    setHighlightedSala(sala);
-  };
-
   const resetMap = () => {
-    setHighlightedSala(null);
-    setSearchResult(null);
+    setSelectedSala(null);
+    setCurrentImage("mapa1.png");
     handleResetZoom();
   };
 
-  // Handler de zoom estável sem movimento indesejado
+  // Handler de zoom melhorado para melhor controle
   const onPinchGestureEvent = (event: any) => {
     const { scale: gestureScale, focalX: gestureFocalX, focalY: gestureFocalY } = event.nativeEvent;
     
     // Capturar ponto focal (onde o usuário tocou)
     focalX.current = gestureFocalX - width / 2;
-    focalY.current = gestureFocalY - (height * 0.6) / 2; // Ajustado para nova altura
+    focalY.current = gestureFocalY - (height * 0.7) / 2;
     
     // Aplicar zoom com limites mais restritivos
     const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, gestureScale));
@@ -212,7 +263,7 @@ export default function MapaScreen() {
     const clampedTranslateX = Math.max(limits.minX, Math.min(limits.maxX, newTranslateX));
     const clampedTranslateY = Math.max(limits.minY, Math.min(limits.maxY, newTranslateY));
     
-    // Aplicar transformações diretamente sem animação
+    // Aplicar transformações com suavização
     scale.setValue(newScale);
     translateX.setValue(clampedTranslateX);
     translateY.setValue(clampedTranslateY);
@@ -239,7 +290,7 @@ export default function MapaScreen() {
     }
   };
 
-  // Handler de pan com limites rigorosos
+  // Handler de pan melhorado para evitar sair da tela
   const onPanGestureEvent = (event: any) => {
     const { translationX, translationY } = event.nativeEvent;
     const currentScale = baseScale.current;
@@ -254,8 +305,8 @@ export default function MapaScreen() {
     const clampedTranslateY = Math.max(limits.minY, Math.min(limits.maxY, newTranslateY));
     
     // Validação adicional: garantir que o mapa sempre fique visível
-    const finalTranslateX = Math.max(-width * 0.4, Math.min(width * 0.4, clampedTranslateX));
-    const finalTranslateY = Math.max(-height * 0.3, Math.min(height * 0.3, clampedTranslateY));
+    const finalTranslateX = Math.max(-width * 0.2, Math.min(width * 0.2, clampedTranslateX));
+    const finalTranslateY = Math.max(-height * 0.15, Math.min(height * 0.15, clampedTranslateY));
     
     // Aplicar movimento com limites rigorosos
     translateX.setValue(finalTranslateX);
@@ -276,8 +327,8 @@ export default function MapaScreen() {
       const clampedY = Math.max(limits.minY, Math.min(limits.maxY, newBaseTranslateY));
       
       // Validação final: garantir que o mapa sempre fique visível
-      baseTranslateX.current = Math.max(-width * 0.4, Math.min(width * 0.4, clampedX));
-      baseTranslateY.current = Math.max(-height * 0.3, Math.min(height * 0.3, clampedY));
+      baseTranslateX.current = Math.max(-width * 0.2, Math.min(width * 0.2, clampedX));
+      baseTranslateY.current = Math.max(-height * 0.15, Math.min(height * 0.15, clampedY));
       
       // Atualizar valores finais
       translateX.setValue(baseTranslateX.current);
@@ -286,16 +337,20 @@ export default function MapaScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: safeTop, paddingBottom: safeBottom }]}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+    <View style={styles.mainContainer}>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
+      {/* Container principal com Safe Area */}
+      <View style={[styles.container, { paddingTop: safeTop }]}>
+        {/* Header fixo */}
+        <HeaderPerfil title="Mapa" />
 
       {/* Search Bar Moderna */}
       <View style={styles.searchContainer}>
         <SearchBar
           salas={salas}
           onSearch={handleSearch}
-          onSalaSelect={handleSalaSelect}
+          onSalaSelect={handleSearch}
         />
       </View>
 
@@ -327,22 +382,10 @@ export default function MapaScreen() {
                     ]}
                   >
                     <ImageBackground
-                      source={require('../assets/images/mapa1.png')}
+                      source={getImageSource(currentImage)}
                       style={styles.mapImageBackground}
                       resizeMode="contain"
-                    >
-                      {/* Renderizar todos os marcadores */}
-                      {salas.map((sala, index) => (
-                        <MapMarker
-                          key={index}
-                          x={sala.x}
-                          y={sala.y}
-                          highlighted={highlightedSala?.nome === sala.nome}
-                          color={getSalaColor(sala.nome)}
-                          size={16}  // Tamanho fixo para todas as salas
-                        />
-                      ))}
-                    </ImageBackground>
+                    />
                   </Animated.View>
                 </PinchGestureHandler>
               </Animated.View>
@@ -359,17 +402,39 @@ export default function MapaScreen() {
         </Animated.Text>
       </View>
 
+      {/* Indicador de Sala Selecionada */}
+      {selectedSala && (
+        <View style={[styles.imageIndicator, { top: safeTop + 50 }]}>
+          <Text style={styles.imageText}>
+            {selectedSala.nome}
+          </Text>
+        </View>
+      )}
+
+
+
+
+
+
+
+      {/* Botão para resetar zoom */}
+      <TouchableOpacity style={[styles.resetZoomButton, { bottom: 80 }]} onPress={handleResetZoom}>
+        <Ionicons name="refresh" size={20} color="#fff" />
+        <Text style={styles.resetZoomText}>Resetar Zoom</Text>
+      </TouchableOpacity>
 
       {/* Botão para limpar seleção */}
-      {highlightedSala && (
-        <TouchableOpacity style={[styles.clearSelectionButton, { bottom: safeBottom + 150 }]} onPress={() => setHighlightedSala(null)}>
+      {selectedSala && (
+        <TouchableOpacity style={[styles.clearSelectionButton, { bottom: 130 }]} onPress={resetMap}>
           <Ionicons name="close-circle" size={20} color="#fff" />
-          <Text style={styles.clearSelectionText}>Limpar seleção</Text>
+          <Text style={styles.clearSelectionText}>Voltar ao mapa geral</Text>
         </TouchableOpacity>
       )}
 
-      {/* BottomNav fixo no final */}
-      <View style={{ paddingBottom: safeBottom }}>
+      </View>
+
+      {/* BottomNav fixo no final - fora do container principal */}
+      <View style={styles.bottomNavContainer}>
         <BottomNav />
       </View>
     </View>
@@ -377,31 +442,30 @@ export default function MapaScreen() {
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+  },
+  bottomNavContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
   },
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#667eea',
-    shadowColor: '#667eea',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
     zIndex: 100,
   },
   mapContainer: {
     flex: 1,
     backgroundColor: '#f0f0f0',
     zIndex: 1,
-    marginBottom: 80, // Reduzido de 100 para 80
+    paddingTop: 10, // Adiciona espaço no topo
   },
   gestureContainer: {
     flex: 1,
@@ -413,7 +477,7 @@ const styles = StyleSheet.create({
   },
   mapImage: {
     width: width,
-    height: height * 0.6, // Reduzido de 0.7 para 0.6
+    height: height * 0.7, // Aumentado para 0.7 para ficar mais acima
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -463,5 +527,45 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 4,
+  },
+  resetZoomButton: {
+    position: 'absolute',
+    bottom: 80,
+    right: 10,
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#4CAF50',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    maxWidth: width - 20,
+  },
+  resetZoomText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  imageIndicator: {
+    position: 'absolute',
+    left: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    maxWidth: width - 20,
+  },
+  imageText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

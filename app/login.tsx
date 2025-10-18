@@ -1,113 +1,114 @@
-import { View, Text, Button, TextInput, StyleSheet, StatusBar, Switch, Image } from 'react-native';
-import { useRouter, Link } from 'expo-router'; 
-import React, {useState} from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Link, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, StatusBar, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import BotaoCustomizado from '../components/buttons';
-import {LinearGradient} from 'expo-linear-gradient';
+import { AppColors } from '../constants/theme';
 
 
 export default function telaLogin () {
     const router = useRouter();
     const [isChecked, setItChecked] = useState(false);
-
+    const insets = useSafeAreaInsets();
 
     return (
-      <LinearGradient
-        colors={["#9560e1", "#005c83"]} // 👈 cores do gradiente
-        style={styles.container}
-        start={{ x: 0, y: 1 }}
-        end={{ x: 1, y: 0 }}>
+      <SafeAreaView style={[styles.safeArea, { paddingTop: insets.top }]}>
+        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+        <LinearGradient
+          colors={['#9560e1', '#005c83']}
+          style={styles.container}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 0 }}>
 
-          <View style={styles.container}>
-            <StatusBar barStyle={'dark-content'} />
-            {/* <Button title="Voltar" onPress={() => router.back()} /> */}
+            <View style={styles.content}>
+              
+              <Image source={require("../assets/images/logotipo-coruja.png")} style={styles.img} />
+              
+              <Text style={styles.text}>Login</Text>
 
-            
-            <Image source={require("../assets/images/logotipo-coruja.png")} style={styles.img} />
-            
-            
+              <TextInput placeholder='seuemail@souunisuam.com.br'  placeholderTextColor={AppColors.textLight} style = {styles.input}  accessibilityLabel='Campo de e-mail'/>
+              <TextInput placeholder='Insira sua senha'  placeholderTextColor={AppColors.textLight}   secureTextEntry={true} style={styles.input}  accessibilityLabel='Campo de senha' />
 
-            <Text style={styles.text}>Login</Text>
+              <View style={styles.row}>
+                <Switch
+                value={isChecked}
+                onValueChange={setItChecked}
+                trackColor={{ false: AppColors.border, true: AppColors.primary }}
+                thumbColor={isChecked ? AppColors.textWhite : AppColors.borderLight}
+                accessible= {true}
+                accessibilityLabel='Mantenha-me conectado'
+                accessibilityHint="Ativa ou desativa se manter conectado no app"
+                accessibilityState={{checked: isChecked}}
+                />
+                <Text style={styles.text2}>Mantenha-me conectado</Text>
+              </View>
 
-            <TextInput placeholder='seuemail@souunisuam.com.br'  placeholderTextColor="#7a7a8bff" style = {styles.input}  accessibilityLabel='Campo de e-mail'/>
-            <TextInput placeholder='Insira sua senha'  placeholderTextColor="#7a7a8bff"   secureTextEntry={true} style={styles.input}  accessibilityLabel='Campo de senha' />
+              <Link href="/cadastro" asChild>
+                <BotaoCustomizado title='Entrar' onPress={()=> 'void'} />
+              </Link>
 
-
-            <View style={styles.row}>
-              <Switch
-              value={isChecked}
-              onValueChange={setItChecked}
-              trackColor={{ false: "#767577", true: "#761fa8" }}
-              thumbColor={isChecked ? "#fff" : "#f4f3f4"}
-              accessible= {true}
-              accessibilityLabel='Mantenha-me conectado'
-              accessibilityHint="Ativa ou desativa se manter conectado no app"
-              accessibilityState={{checked: isChecked}}
-              />
-              <Text style={styles.text2}>Mantenha-me conectado</Text>
+              <Text style={styles.text2}>Você é novo por aqui?</Text>
+              <Link href="/cadastro" asChild>
+                <BotaoCustomizado title='Cadastre-se' onPress={()=> 'void'}/>
+              </Link>
+          
             </View>
-
-            <Link href="/cadastro" asChild>
-              <BotaoCustomizado title='Entrar' onPress={()=> 'void'} />
-            </Link>
-
-            <Text style={styles.text2}>Você é novo por aqui?</Text>
-            <Link href="/cadastro" asChild>
-              <BotaoCustomizado title='Cadastre-se' onPress={()=> 'void'}/>
-            </Link>
-        
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+      </SafeAreaView>
     );
   }
 
 const styles = StyleSheet.create({
-
+  safeArea: {
+    flex: 1,
+    backgroundColor: AppColors.primary,
+  },
   container: { 
     flex: 1, 
     alignItems: 'center', 
     justifyContent: 'center',
-    gap: 10,
     width: '100%',
-    padding: 10,
-    },
-
+    padding: 20,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center', 
+    justifyContent: 'center',
+    width: '100%',
+    gap: 10,
+  },
   text: { 
     textAlign: 'left',
     fontSize: 30,
     marginBottom: 16,
     fontWeight: 800,
-    // Faz com que o texto renha espaço o suficiente para obedecer os comandos de textAlign right, center e left
     width: '100%',
-    color: '#FFF',
-    },
-
-    text2: {
-      fontSize: 16,
-      color: '#FFF',
-    },
-
+    color: AppColors.textWhite,
+  },
+  text2: {
+    fontSize: 16,
+    color: AppColors.textWhite,
+  },
   input: {
     fontSize: 18,
     width: '100%',
-    borderColor: '#b9b9b9ff',
+    borderColor: AppColors.border,
     borderWidth: 1,
     margin: 12,
     padding: 10,
     borderRadius: 10,
-    color: '#242424ff',
-    backgroundColor: '#FFF',
+    color: AppColors.textPrimary,
+    backgroundColor: AppColors.backgroundCard,
   },
-
   row: {
-    flexDirection: "row", // 👈 coloca lado a lado
-    alignItems: "center", // 👈 centraliza na vertical
-    gap: 10, // se sua versão de RN suportar (ou use marginRight)
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
-
   img: {
     alignSelf: 'center',
     width: 150, 
     height: 100,
   }
- 
 });

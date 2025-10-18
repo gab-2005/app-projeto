@@ -1,29 +1,78 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Paleta de cores padronizada para o app
+ * Baseada nas cores já utilizadas no projeto
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Cores principais da paleta
+export const AppColors = {
+  // Cores primárias
+  primary: '#7e57c2',        // Roxo principal
+  primaryDark: '#5e3a9a',   // Roxo escuro
+  primaryLight: '#9c7dd4',  // Roxo claro
+  
+  // Cores secundárias
+  secondary: '#0097a7',      // Azul secundário
+  secondaryDark: '#006064',  // Azul escuro
+  secondaryLight: '#4dd0e1', // Azul claro
+  
+  // Cores de fundo
+  background: '#F9F9F9',     // Fundo principal
+  backgroundCard: '#FFFFFF', // Fundo dos cards
+  backgroundDark: '#141414', // Fundo escuro
+  
+  // Cores de texto
+  textPrimary: '#333333',   // Texto principal
+  textSecondary: '#666666', // Texto secundário
+  textLight: '#999999',     // Texto claro
+  textWhite: '#FFFFFF',     // Texto branco
+  
+  // Cores de status
+  success: '#4CAF50',       // Verde sucesso
+  warning: '#FF9800',       // Laranja aviso
+  error: '#F44336',         // Vermelho erro
+  info: '#2196F3',          // Azul informação
+  
+  // Cores de borda e divisores
+  border: '#E0E0E0',        // Borda padrão
+  borderLight: '#F0F0F0',   // Borda clara
+  divider: '#CCCCCC',       // Divisor
+  
+  // Cores de botão
+  buttonPrimary: '#7e57c2',  // Botão primário
+  buttonSecondary: '#0097a7', // Botão secundário
+  buttonDisabled: '#9E9E9E', // Botão desabilitado
+  
+  // Cores de navegação
+  tabActive: '#917AFD',      // Aba ativa
+  tabInactive: '#727272',   // Aba inativa
+  
+  // Cores de gradiente
+  gradientStart: '#7e57c2',  // Início do gradiente
+  gradientEnd: '#0097a7',    // Fim do gradiente
+  gradientLogin: ['#9560e1', '#005c83'], // Gradiente login
+};
+
+const tintColorLight = AppColors.primary;
+const tintColorDark = AppColors.textWhite;
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: AppColors.textPrimary,
+    background: AppColors.background,
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    icon: AppColors.textSecondary,
+    tabIconDefault: AppColors.tabInactive,
+    tabIconSelected: AppColors.tabActive,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: AppColors.textWhite,
+    background: AppColors.backgroundDark,
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    icon: AppColors.textLight,
+    tabIconDefault: AppColors.textLight,
+    tabIconSelected: AppColors.tabActive,
   },
 };
 

@@ -2,10 +2,11 @@
 import { Link } from 'expo-router';
 import React from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
 import BotaoCustomizado from '../../components/buttons';
 import HeaderPerfil from '../../components/HeaderPerfil';
+import { AppColors } from '../../constants/theme';
 
 
 export default function TelaInicial() {
@@ -13,8 +14,8 @@ export default function TelaInicial() {
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
+    <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
       {/* Header fixo */}
       <HeaderPerfil />
@@ -31,32 +32,29 @@ export default function TelaInicial() {
 
         <View style={styles.buttonsWrapper}>
           <Link href="/detalhes" asChild>
-            <BotaoCustomizado title="Ir para Detalhes" />
+            <BotaoCustomizado title="Ir para Detalhes" onPress={() => {}} />
           </Link>
 
           <Link href="/login" asChild>
-            <BotaoCustomizado title="Ir para o Login" />
+            <BotaoCustomizado title="Ir para o Login" onPress={() => {}} />
           </Link>
 
           <Link href="/cadastro" asChild>
-            <BotaoCustomizado title="Ir para o Cadastro" />
+            <BotaoCustomizado title="Ir para o Cadastro" onPress={() => {}} />
           </Link>
         </View>
       </ScrollView>
 
       {/* BottomNav fixo no final */}
-      <View style={{ paddingBottom: insets.bottom }}>
-        <BottomNav />
-      </View>
-    </SafeAreaView>
+      <BottomNav />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9F9',
-    
+    backgroundColor: AppColors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -67,13 +65,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#333',
+    color: AppColors.textPrimary,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: AppColors.textSecondary,
     marginBottom: 30,
     textAlign: 'center',
     paddingHorizontal: 10,

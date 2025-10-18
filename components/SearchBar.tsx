@@ -1,20 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Keyboard,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface Sala {
   nome: string;
-  x: number;
-  y: number;
+  imagem: string;
 }
 
 interface SearchBarProps {
@@ -139,26 +138,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 30,
-    paddingHorizontal: 6,
-    paddingVertical: 6,
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     shadowColor: '#667eea',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 0,
     },
     shadowOpacity: 0.25,
     shadowRadius: 12,
     elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(102, 126, 234, 0.2)',
+    borderWidth: 0,
+    borderColor: 'rgba(255, 0, 0, 0.2)',
   },
   inputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 1,
+    borderRadius: 30,
+    backgroundColor: 'rgba(102, 126, 234, 0.05)',
   },
   searchIcon: {
     marginRight: 10,
@@ -171,8 +172,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   clearButton: {
-    padding: 6,
-    borderRadius: 12,
+    padding: 10,
+    borderRadius: 10,
     backgroundColor: 'rgba(102, 126, 234, 0.1)',
   },
   searchButton: {

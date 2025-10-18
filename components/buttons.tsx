@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Alert, Text, StyleSheet, Pressable, TextStyle, StyleProp, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
+import { AppColors } from '../constants/theme';
 
 
 type BotaoCustomizadoProps = {
@@ -35,7 +36,7 @@ const BotaoCustomizado: React.FC<BotaoCustomizadoProps> = ({ title, onPress, sty
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#761fa8ff',
+    backgroundColor: AppColors.buttonPrimary,
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,
@@ -43,17 +44,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 10,
     width: '100%',
+    shadowColor: AppColors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   text: {
-    color: '#ffffff',
+    color: AppColors.textWhite,
     fontSize: 16,
     fontWeight: 'bold',
   },
   buttonDisabled: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: AppColors.buttonDisabled,
   },
   buttonPressed: {
-    opacity: 0.5,
+    opacity: 0.8,
   }
 });
 

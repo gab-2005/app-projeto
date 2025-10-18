@@ -1,20 +1,23 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  Switch,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Animated,
+    Alert,
+    Animated,
+    Image,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
+import HeaderPerfil from '../../components/HeaderPerfil';
 import { useAppTheme } from '../../components/ThemeContext';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AppColors } from '../../constants/theme';
 import { useAvatar } from '../../hooks/useAvatar';
 
 export default function TelaPerfil() {
@@ -23,7 +26,13 @@ export default function TelaPerfil() {
   const insets = useSafeAreaInsets();
   const { avatar, pickImage } = useAvatar();
 
-  const OptionItem = ({ icon, label, color = "#fff", rightElement, onPress }) => {
+  const OptionItem = ({ icon, label, color = "#fff", rightElement, onPress }: {
+    icon: string;
+    label: string;
+    color?: string;
+    rightElement?: React.ReactNode;
+    onPress?: () => void;
+  }) => {
     const scaleAnim = new Animated.Value(1);
 
     const handlePressIn = () => {
@@ -51,7 +60,7 @@ export default function TelaPerfil() {
           activeOpacity={0.7}
         >
           <View style={styles.optionLeft}>
-            <Ionicons name={icon} size={22} color={color} style={{ marginRight: 10 }} />
+            <Ionicons name={icon as any} size={22} color={color} style={{ marginRight: 10 }} />
             <Text style={[styles.optionText, { color }]}>{label}</Text>
           </View>
           {rightElement && rightElement}
@@ -72,77 +81,88 @@ export default function TelaPerfil() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: insets.top }}>
-      <LinearGradient
-        colors={isDark ? ['#141414', '#2c2c2c'] : ['#7e57c2', '#0097a7']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
+    <View style={styles.mainContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+      
+      {/* Container principal com Safe Area */}
+      <View style={[styles.safeArea, { paddingTop: insets.top }]}>
+        {/* Header fixo */}
+        <HeaderPerfil title="Perfil" showAvatar={false} />
 
-        {/* Cabeçalho */}
-        <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Perfil</Text>
-          <View style={{ width: 24 }} />
-        </View>
+        <LinearGradient
+          colors={isDark ? [AppColors.backgroundDark, '#2c2c2c'] : [AppColors.primary, AppColors.secondary]}
+          style={styles.container}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            
+            {/* Avatar */}
+            <View style={styles.avatarWrapper}>
+              <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
+                <LinearGradient colors={[AppColors.backgroundCard, AppColors.border]} style={styles.avatarBorder}>
+                  <Image source={avatar} style={styles.avatar} />
+                </LinearGradient>
+                <View style={styles.cameraIcon}>
+                  <Ionicons name="camera" size={18} color={AppColors.textWhite} />
+                </View>
+              </TouchableOpacity>
+            </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          
-          {/* Avatar */}
-          <View style={styles.avatarWrapper}>
-            <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
-              <LinearGradient colors={['#fff', '#bbb']} style={styles.avatarBorder}>
-                <Image source={avatar} style={styles.avatar} />
-              </LinearGradient>
-              <View style={styles.cameraIcon}>
-                <Ionicons name="camera" size={18} color="#fff" />
-              </View>
-            </TouchableOpacity>
-          </View>
+            <Text style={styles.email}>{email}</Text>
 
-          <Text style={styles.email}>{email}</Text>
+            {/* Opções */}
+            <OptionItem
+              icon="moon"
+              label="Modo Escuro"
+              rightElement={<Switch value={isDark} onValueChange={toggleTheme} />}
+              onPress={() => {}}
+            />
+            <OptionItem 
+              icon="person-circle-outline" 
+              label="Informações Pessoais" 
+              rightElement={null}
+              onPress={() => {}}
+            />
+            <OptionItem 
+              icon="eye-outline" 
+              label="Acessibilidade" 
+              rightElement={null}
+              onPress={() => {}}
+            />
+            <OptionItem 
+              icon="settings-outline" 
+              label="Configurações" 
+              rightElement={null}
+              onPress={() => {}}
+            />
+            <OptionItem
+              icon="log-out-outline"
+              label="Sair da Conta"
+              color="red"
+              rightElement={null}
+              onPress={handleLogout}
+            />
 
-          {/* Opções */}
-          <OptionItem
-            icon="moon"
-            label="Modo Escuro"
-            rightElement={<Switch value={isDark} onValueChange={toggleTheme} />}
-          />
-          <OptionItem icon="person-circle-outline" label="Informações Pessoais" />
-          <OptionItem icon="eye-outline" label="Acessibilidade" />
-          <OptionItem icon="settings-outline" label="Configurações" />
-          <OptionItem
-            icon="log-out-outline"
-            label="Sair da Conta"
-            color="red"
-            onPress={handleLogout}
-          />
+          </ScrollView>
+        </LinearGradient>
+      </View>
 
-        </ScrollView>
-
-        <BottomNav />
-      </LinearGradient>
-    </SafeAreaView>
+      {/* BottomNav fixo no final - fora do container principal */}
+      <BottomNav />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: AppColors.background,
+  },
+  safeArea: {
+    flex: 1,
+  },
   container: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
-  },
   scrollContent: {
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -170,7 +190,7 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 16,
-    color: '#fff',
+    color: AppColors.textWhite,
     marginBottom: 25,
     fontWeight: '500',
   },
@@ -191,6 +211,6 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: '#fff',
+    color: AppColors.textWhite,
   },
 });
