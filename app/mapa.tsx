@@ -163,8 +163,8 @@ export default function MapaScreen() {
   
   // Configurações otimizadas para melhor controle
   const MIN_ZOOM = 0.8; // Zoom mínimo mais restritivo
-  const MAX_ZOOM = 2.5; // Zoom máximo mais controlado
-  const RESET_THRESHOLD = 0.85; // Retorna quando expandir demais
+  const MAX_ZOOM = 1.5; // Zoom máximo mais controlado (reduzido de 2.5 para 1.5)
+  const RESET_THRESHOLD = 0; // Retorna quando expandir demais
   const ZOOM_OUT_THRESHOLD = 0.9; // Retorna quando afastar demais
 
 
@@ -175,19 +175,23 @@ export default function MapaScreen() {
   // Função para calcular limites rigorosos da tela - melhorada para evitar sair da tela
   const getScreenLimits = (currentScale: number) => {
     const imageWidth = width;
-    const imageHeight = height * 0.7; // Ajustado para nova altura
+    const imageHeight = height * 0.4; // Ajustado para nova altura
     const scaledWidth = imageWidth * currentScale;
     const scaledHeight = imageHeight * currentScale;
     
+    // Área segura para não interferir com SearchBar (aproximadamente 120px do topo)
+    const searchBarHeight = 120;
+    const availableHeight = height - searchBarHeight;
+    
     // Calcular limites para manter imagem sempre visível
     const maxTranslateX = Math.max(0, (scaledWidth - width) / 2);
-    const maxTranslateY = Math.max(0, (scaledHeight - height * 0.7) / 2);
+    const maxTranslateY = Math.max(0, (scaledHeight - availableHeight) / 2);
     
-    // Limites mais rigorosos - sempre manter o mapa visível
+    // Limites mais rigorosos - sempre manter o mapa visível e respeitar SearchBar
     const strictMinX = Math.min(-maxTranslateX, -width * 0.15); // Máximo 15% da tela para fora
     const strictMaxX = Math.max(maxTranslateX, width * 0.15);   // Máximo 15% da tela para fora
-    const strictMinY = Math.min(-maxTranslateY, -height * 0.1); // Máximo 10% da tela para fora
-    const strictMaxY = Math.max(maxTranslateY, height * 0.1);   // Máximo 10% da tela para fora
+    const strictMinY = Math.min(-maxTranslateY, -height * 0.05); // Máximo 5% da tela para fora (mais restritivo)
+    const strictMaxY = Math.max(maxTranslateY, height * 0.05);   // Máximo 5% da tela para fora (mais restritivo)
     
     return {
       minX: strictMinX,
@@ -248,7 +252,7 @@ export default function MapaScreen() {
     
     // Capturar ponto focal (onde o usuário tocou)
     focalX.current = gestureFocalX - width / 2;
-    focalY.current = gestureFocalY - (height * 0.7) / 2;
+    focalY.current = gestureFocalY - (height * 0.4) / 2;
     
     // Aplicar zoom com limites mais restritivos
     const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, gestureScale));
@@ -304,9 +308,9 @@ export default function MapaScreen() {
     const clampedTranslateX = Math.max(limits.minX, Math.min(limits.maxX, newTranslateX));
     const clampedTranslateY = Math.max(limits.minY, Math.min(limits.maxY, newTranslateY));
     
-    // Validação adicional: garantir que o mapa sempre fique visível
+    // Validação adicional: garantir que o mapa sempre fique visível e respeite SearchBar
     const finalTranslateX = Math.max(-width * 0.2, Math.min(width * 0.2, clampedTranslateX));
-    const finalTranslateY = Math.max(-height * 0.15, Math.min(height * 0.15, clampedTranslateY));
+    const finalTranslateY = Math.max(-height * 0.05, Math.min(height * 0.05, clampedTranslateY));
     
     // Aplicar movimento com limites rigorosos
     translateX.setValue(finalTranslateX);
@@ -326,9 +330,9 @@ export default function MapaScreen() {
       const clampedX = Math.max(limits.minX, Math.min(limits.maxX, newBaseTranslateX));
       const clampedY = Math.max(limits.minY, Math.min(limits.maxY, newBaseTranslateY));
       
-      // Validação final: garantir que o mapa sempre fique visível
+      // Validação final: garantir que o mapa sempre fique visível e respeite SearchBar
       baseTranslateX.current = Math.max(-width * 0.2, Math.min(width * 0.2, clampedX));
-      baseTranslateY.current = Math.max(-height * 0.15, Math.min(height * 0.15, clampedY));
+      baseTranslateY.current = Math.max(-height * 0.05, Math.min(height * 0.05, clampedY));
       
       // Atualizar valores finais
       translateX.setValue(baseTranslateX.current);
@@ -472,12 +476,13 @@ const styles = StyleSheet.create({
   },
   mapWrapper: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    paddingTop: 50,
   },
   mapImage: {
     width: width,
-    height: height * 0.7, // Aumentado para 0.7 para ficar mais acima
+    height: height * 0.4, // Reduzido para 0.4 para subir a imagem e evitar scroll
     justifyContent: 'center',
     alignItems: 'center',
   },
