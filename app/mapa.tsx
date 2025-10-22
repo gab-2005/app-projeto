@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -139,6 +139,10 @@ const getImageSource = (imageName: string) => {
 export default function MapaScreen() {
   const [selectedSala, setSelectedSala] = useState<Sala | null>(null);
   const [currentImage, setCurrentImage] = useState<string>("mapa1.png");
+  const [isZooming, setIsZooming] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [lastGestureTime, setLastGestureTime] = useState(0);
   
   // Safe area insets para garantir que o layout não fique atrás dos ícones do sistema
   const insets = useSafeAreaInsets();
@@ -151,6 +155,9 @@ export default function MapaScreen() {
   const scale = useRef(new Animated.Value(1)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
+  
+  // Animações simplificadas
+  const controlsOpacity = useRef(new Animated.Value(1)).current;
   
   // Valores base para controle
   const baseScale = useRef(1);
@@ -166,6 +173,33 @@ export default function MapaScreen() {
   const MAX_ZOOM = 1.5; // Zoom máximo mais controlado (reduzido de 2.5 para 1.5)
   const RESET_THRESHOLD = 0; // Retorna quando expandir demais
   const ZOOM_OUT_THRESHOLD = 0.9; // Retorna quando afastar demais
+
+  // Auto-hide controls após inatividade
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (Date.now() - lastGestureTime > 3000) {
+        setShowControls(false);
+        Animated.timing(controlsOpacity, {
+          toValue: 0.3,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [lastGestureTime, controlsOpacity]);
+
+  // Mostrar controles ao tocar
+  const showControlsTemporarily = () => {
+    setShowControls(true);
+    setLastGestureTime(Date.now());
+    Animated.timing(controlsOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
 
 
 
@@ -250,12 +284,18 @@ export default function MapaScreen() {
   const onPinchGestureEvent = (event: any) => {
     const { scale: gestureScale, focalX: gestureFocalX, focalY: gestureFocalY } = event.nativeEvent;
     
+    // Mostrar controles e atualizar tempo
+    showControlsTemporarily();
+    setIsZooming(true);
+    
     // Capturar ponto focal (onde o usuário tocou)
     focalX.current = gestureFocalX - width / 2;
     focalY.current = gestureFocalY - (height * 0.4) / 2;
     
     // Aplicar zoom com limites mais restritivos
     const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, gestureScale));
+    
+    // Removido: feedback háptico desnecessário
     
     // Calcular translação para manter foco no ponto tocado
     const scaleFactor = newScale - 1;
@@ -276,11 +316,14 @@ export default function MapaScreen() {
     baseScale.current = newScale;
     baseTranslateX.current = clampedTranslateX;
     baseTranslateY.current = clampedTranslateY;
+    
+    // Removido: animação desnecessária do indicador
   };
 
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
       const currentZoom = baseScale.current;
+      setIsZooming(false);
       
       // Retornar automaticamente se expandir demais (para não bagunçar layout)
       if (currentZoom < RESET_THRESHOLD) {
@@ -291,6 +334,9 @@ export default function MapaScreen() {
         handleResetZoom();
       }
       // Manter zoom se estiver dentro dos limites aceitáveis
+      else {
+        // Removido: feedback háptico desnecessário
+      }
     }
   };
 
@@ -298,6 +344,10 @@ export default function MapaScreen() {
   const onPanGestureEvent = (event: any) => {
     const { translationX, translationY } = event.nativeEvent;
     const currentScale = baseScale.current;
+    
+    // Mostrar controles e atualizar tempo
+    showControlsTemporarily();
+    setIsPanning(true);
     
     // Calcular nova posição
     const newTranslateX = baseTranslateX.current + translationX;
@@ -312,6 +362,8 @@ export default function MapaScreen() {
     const finalTranslateX = Math.max(-width * 0.2, Math.min(width * 0.2, clampedTranslateX));
     const finalTranslateY = Math.max(-height * 0.05, Math.min(height * 0.05, clampedTranslateY));
     
+    // Removido: feedback háptico desnecessário
+    
     // Aplicar movimento com limites rigorosos
     translateX.setValue(finalTranslateX);
     translateY.setValue(finalTranslateY);
@@ -321,6 +373,7 @@ export default function MapaScreen() {
     if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
       const currentScale = baseScale.current;
       const limits = getScreenLimits(currentScale);
+      setIsPanning(false);
       
       // Atualizar posição base com limites rigorosos
       const newBaseTranslateX = baseTranslateX.current + event.nativeEvent.translationX;
@@ -337,6 +390,8 @@ export default function MapaScreen() {
       // Atualizar valores finais
       translateX.setValue(baseTranslateX.current);
       translateY.setValue(baseTranslateY.current);
+      
+      // Removido: feedback háptico desnecessário
     }
   };
 
@@ -361,6 +416,8 @@ export default function MapaScreen() {
       {/* Mapa Container */}
       <View style={styles.mapContainer}>
         <GestureHandlerRootView style={styles.gestureContainer}>
+          {/* Removido: indicador de gestos que causava fibrilação */}
+          
           <Animated.View style={styles.mapWrapper}>
             <PanGestureHandler
               onGestureEvent={onPanGestureEvent}
@@ -399,20 +456,23 @@ export default function MapaScreen() {
       </View>
 
 
-      {/* Indicador de Zoom */}
-      <View style={[styles.zoomIndicator, { top: safeTop + 10 }]}>
-        <Animated.Text style={styles.zoomText}>
-          {Math.round(baseScale.current * 100)}%
-        </Animated.Text>
-      </View>
+      {/* Removido: indicador de zoom que causava fibrilação */}
 
-      {/* Indicador de Sala Selecionada */}
+      {/* Indicador de Sala Selecionada - simplificado */}
       {selectedSala && (
-        <View style={[styles.imageIndicator, { top: safeTop + 50 }]}>
+        <Animated.View 
+          style={[
+            styles.imageIndicator, 
+            { 
+              top: safeTop + 50,
+              opacity: controlsOpacity
+            }
+          ]}
+        >
           <Text style={styles.imageText}>
             {selectedSala.nome}
           </Text>
-        </View>
+        </Animated.View>
       )}
 
 
@@ -422,17 +482,29 @@ export default function MapaScreen() {
 
 
       {/* Botão para resetar zoom */}
-      <TouchableOpacity style={[styles.resetZoomButton, { bottom: 80 }]} onPress={handleResetZoom}>
-        <Ionicons name="refresh" size={20} color="#fff" />
-        <Text style={styles.resetZoomText}>Resetar Zoom</Text>
-      </TouchableOpacity>
+      <Animated.View style={{ opacity: controlsOpacity }}>
+        <TouchableOpacity 
+          style={[styles.resetZoomButton, { bottom: 80 }]} 
+          onPress={handleResetZoom}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="refresh" size={20} color="#fff" />
+          <Text style={styles.resetZoomText}>Resetar Zoom</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Botão para limpar seleção */}
       {selectedSala && (
-        <TouchableOpacity style={[styles.clearSelectionButton, { bottom: 130 }]} onPress={resetMap}>
-          <Ionicons name="close-circle" size={20} color="#fff" />
-          <Text style={styles.clearSelectionText}>Voltar ao mapa geral</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ opacity: controlsOpacity }}>
+          <TouchableOpacity 
+            style={[styles.clearSelectionButton, { bottom: 130 }]} 
+            onPress={resetMap}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="close-circle" size={20} color="#fff" />
+            <Text style={styles.clearSelectionText}>Voltar ao mapa geral</Text>
+          </TouchableOpacity>
+        </Animated.View>
       )}
 
       </View>
@@ -492,21 +564,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  zoomIndicator: {
-    position: 'absolute',
-    left: 10,
-    top: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    maxWidth: width - 20,
-  },
-  zoomText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  // Removido: estilos do indicador de zoom
   clearSelectionButton: {
     position: 'absolute',
     bottom: 150,
@@ -573,4 +631,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  // Removido: estilos dos indicadores que causavam fibrilação
 });
