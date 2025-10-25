@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AppColors } from "../constants/theme";
 import { useAvatar } from "../hooks/useAvatar";
 
@@ -19,7 +19,7 @@ export default function HeaderPerfil({
   return (
     <View style={styles.container}>
       <View style={styles.leftSection}>
-        <Text style={styles.saudacao}>{title || saudacao}</Text>
+        {/* Texto removido - header vazio */}
       </View>
       {showAvatar && (
         <TouchableOpacity onPress={pickImage}>

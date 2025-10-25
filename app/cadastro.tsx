@@ -1,6 +1,7 @@
 import BotaoCustomizado from '@/components/buttons';
 import { Ionicons } from '@expo/vector-icons'; //Ícone de check
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -8,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Image, Modal, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
+import { AppColors } from '../constants/theme';
 
 
 //Validações
@@ -15,6 +17,8 @@ const schema = yup.object({
   firstname: yup.string().required("Informe seu primeiro nome."),
   lastname: yup.string().required("Informe seu sobrenome."),
   email: yup.string().email("E-mail inválido!").required("Informe seu e-mail."),
+  phone: yup.string().required("Informe seu telefone."),
+  address: yup.string().required("Informe seu endereço."),
   password: yup.string().min(6, "A senha deve conter pelo menos 6 dígitos.").max(14, "Senha muito longa. Menos de 14 caracteres, por favor.").required("Informe sua senha."),
   //Criando uma comparação com o campo 'password'
   confirmpass: yup.string().oneOf([yup.ref('password')], "As senhas devem ser iguais.").required("Confirme sua senha.")
@@ -33,14 +37,35 @@ export default function telaCadastro() {
   const router = useRouter();
 
   //Função de envio
-  async function handleSignIn() {
+  async function handleSignIn(data: any) {
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      // Simular cadastro bem-sucedido
+      const userToken = 'token_' + Date.now(); // Token simulado
+      const fullName = `${data.firstname} ${data.lastname}`;
+      
+      // Salvar dados do usuário no AsyncStorage
+      await AsyncStorage.setItem('userToken', userToken);
+      await AsyncStorage.setItem('userEmail', data.email);
+      await AsyncStorage.setItem('userName', fullName);
+      await AsyncStorage.setItem('userPhone', data.phone); // Telefone do formulário
+      await AsyncStorage.setItem('userAddress', data.address); // Endereço do formulário
+      
+      setTimeout(() => {
+        setLoading(false);
+        reset(); //Limpa os campos primeiro
+        setShowSuccess(true);
+        
+        // Redirecionar para o login após 3 segundos
+        setTimeout(() => {
+          router.replace('/login');
+        }, 3000);
+      }, 2000);
+    } catch (error) {
+      console.log('Erro ao fazer cadastro:', error);
       setLoading(false);
-      reset(); //Limpa os campos primeiro
-      setShowSuccess(true);
-    }, 2000);
+    }
   } 
 
   return (
@@ -68,7 +93,7 @@ export default function telaCadastro() {
             <Controller control={control} name='firstname' render={({ field: { onChange, onBlur, value } }) => (
               <TextInput style={[styles.input, {
                 borderWidth: errors.firstname && 1,
-                borderColor: errors.firstname && '#ff375b'
+                borderColor: errors.firstname && AppColors.primary
               }]} onChangeText={onChange} 
               onBlur={onBlur}
               value={value}
@@ -83,7 +108,7 @@ export default function telaCadastro() {
             <Controller control={control} name='lastname' render={({ field: { onChange, onBlur, value } }) => (
               <TextInput style={[styles.input, {
                 borderWidth: errors.lastname && 1,
-                borderColor: errors.lastname && '#ff375b'
+                borderColor: errors.lastname && AppColors.primary
               }]} onChangeText={onChange}
               onBlur={onBlur}
               value={value}
@@ -98,7 +123,7 @@ export default function telaCadastro() {
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.email && 1,
-            borderColor: errors.email && '#ff375b',
+            borderColor: errors.email && AppColors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -107,11 +132,37 @@ export default function telaCadastro() {
         )} />
         {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
 
+        {/*Telefone*/}
+        <Controller control={control} name='phone' render={({ field: {onChange, onBlur, value} }) => (
+          <TextInput style={[styles.input, {
+            borderWidth: errors.phone && 1,
+            borderColor: errors.phone && AppColors.primary,
+          }]} onChangeText={onChange} 
+          onBlur={onBlur}
+          value={value} 
+          placeholder='Digite seu telefone'
+          placeholderTextColor="black" />
+        )} />
+        {errors.phone && <Text style={styles.labelError}>{errors.phone?.message}</Text>}
+
+        {/*Endereço*/}
+        <Controller control={control} name='address' render={({ field: {onChange, onBlur, value} }) => (
+          <TextInput style={[styles.input, {
+            borderWidth: errors.address && 1,
+            borderColor: errors.address && AppColors.primary,
+          }]} onChangeText={onChange} 
+          onBlur={onBlur}
+          value={value} 
+          placeholder='Digite seu endereço'
+          placeholderTextColor="black" />
+        )} />
+        {errors.address && <Text style={styles.labelError}>{errors.address?.message}</Text>}
+
         {/*Senha*/}
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.password && 1,
-            borderColor: errors.password && '#ff375b',
+            borderColor: errors.password && AppColors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -125,7 +176,7 @@ export default function telaCadastro() {
         <Controller control={control} name='confirmpass' render={({ field: { onChange, onBlur, value } }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.confirmpass && 1,
-            borderColor: errors.confirmpass && '#ff375b',
+            borderColor: errors.confirmpass && AppColors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur}
           value={value}
@@ -153,12 +204,13 @@ export default function telaCadastro() {
         <Modal visible={showSuccess} animationType="fade" transparent onRequestClose={() => setShowSuccess(false)}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Ionicons name='checkmark-circle' size={100}marginBottom={15} color="#4caf50"/>
+              <Ionicons name='checkmark-circle' size={100}marginBottom={15} color={AppColors.primary}/>
 
               <Text style={styles.modalText}>Conta criada com sucesso!</Text>
+              <Text style={styles.modalSubtext}>Você será redirecionado para o login em alguns segundos...</Text>
 
-              <TouchableOpacity style={styles.modalButton} onPress={() => { setShowSuccess(false); router.replace('/');}}>
-                <Text style={styles.modalButtonText}>Entre no APP</Text>
+              <TouchableOpacity style={styles.modalButton} onPress={() => { setShowSuccess(false); router.replace('/login');}}>
+                <Text style={styles.modalButtonText}>Ir para Login</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -233,7 +285,7 @@ const styles = StyleSheet.create({
   labelError: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    color: '#ff375b',
+    color: AppColors.primary,
     marginBottom: 8,
   },
   modalBackground: {
@@ -254,6 +306,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     marginVertical: 13,
+  },
+  modalSubtext: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   modalButton: {
     backgroundColor: '#4900EB',

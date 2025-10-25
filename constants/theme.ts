@@ -45,7 +45,7 @@ export const AppColors = {
   buttonDisabled: '#9E9E9E', // Botão desabilitado
   
   // Cores de navegação
-  tabActive: '#917AFD',      // Aba ativa
+  tabActive: '#7e57c2',     // Aba ativa - mesmo roxo primário
   tabInactive: '#727272',   // Aba inativa
   
   // Cores de gradiente

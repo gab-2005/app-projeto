@@ -9,8 +9,6 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="perfil" options={{ headerShown: false }} />
-        <Stack.Screen name="detalhes" options={{ headerShown: false }} />
-        <Stack.Screen name="home" options={{ headerShown: false }} />
       </Stack>
     </AppThemeProvider>
   );

@@ -1,24 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Alert,
-  Animated,
-  Dimensions,
-  Image,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  Vibration,
-  View,
+    Alert,
+    Animated,
+    Dimensions,
+    Image,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    Vibration,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
-import HeaderPerfil from '../../components/HeaderPerfil';
 import { useAppTheme } from '../../components/ThemeContext';
 import { AppColors } from '../../constants/theme';
 import { useAvatar } from '../../hooks/useAvatar';
@@ -26,28 +26,56 @@ import { useAvatar } from '../../hooks/useAvatar';
 const { width } = Dimensions.get('window');
 
 export default function TelaPerfil() {
-  const [email] = useState("usuario@email.com");
+  const [userData, setUserData] = useState({
+    email: "usuario@email.com",
+    name: "João Silva Santos",
+    phone: "(11) 99999-9999",
+    address: "Rua das Flores, 123 - São Paulo, SP"
+  });
   const { isDark, toggleTheme } = useAppTheme();
   const insets = useSafeAreaInsets();
   const { avatar, pickImage } = useAvatar();
   
   // Estados essenciais para funcionalidades reais
-  const [fontSize, setFontSize] = useState(16);
-  const [hapticFeedback, setHapticFeedback] = useState(true);
-  const [notifications, setNotifications] = useState(true);
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
-  const [showAccessibility, setShowAccessibility] = useState(false);
-  const [userStats, setUserStats] = useState({
-    totalSessions: 47,
-    favoriteRooms: 12,
-    timeSpent: '2h 34m',
-    lastLogin: 'Hoje'
-  });
   
   // Animações
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  // Função para carregar dados do usuário
+  const loadUserData = useCallback(async () => {
+    try {
+      const userEmail = await AsyncStorage.getItem('userEmail');
+      const userName = await AsyncStorage.getItem('userName');
+      const userPhone = await AsyncStorage.getItem('userPhone');
+      const userAddress = await AsyncStorage.getItem('userAddress');
+      
+      if (userEmail) {
+        setUserData({
+          email: userEmail,
+          name: userName || "Usuário",
+          phone: userPhone || "(11) 99999-9999",
+          address: userAddress || "Endereço não informado"
+        });
+      }
+    } catch (error) {
+      console.log('Erro ao carregar dados do usuário:', error);
+    }
+  }, []);
+
+  // Carregar dados do usuário do AsyncStorage
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  // Recarregar dados sempre que a tela for focada
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [loadUserData])
+  );
 
   // Animações de entrada
   useEffect(() => {
@@ -67,7 +95,7 @@ export default function TelaPerfil() {
 
   // Função para feedback háptico
   const triggerHaptic = (type: 'light' | 'medium' | 'heavy' = 'light') => {
-    if (hapticFeedback && Platform.OS !== 'web') {
+    if (Platform.OS !== 'web') {
       const duration = type === 'light' ? 50 : type === 'medium' ? 100 : 200;
       Vibration.vibrate(duration);
     }
@@ -118,7 +146,7 @@ export default function TelaPerfil() {
           <View style={styles.optionLeft}>
             <Ionicons name={icon as any} size={22} color={color} style={{ marginRight: 10 }} />
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color, fontSize }]}>{label}</Text>
+              <Text style={[styles.optionText, { color }]}>{label}</Text>
               {subtitle && <Text style={styles.optionSubtitle}>{subtitle}</Text>}
             </View>
           </View>
@@ -128,30 +156,6 @@ export default function TelaPerfil() {
     );
   };
 
-  // Componente de estatísticas do usuário
-  const UserStatsCard = () => (
-    <Animated.View style={[styles.statsCard, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-      <Text style={styles.statsTitle}>Suas Estatísticas</Text>
-      <View style={styles.statsGrid}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{userStats.totalSessions}</Text>
-          <Text style={styles.statLabel}>Sessões</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{userStats.favoriteRooms}</Text>
-          <Text style={styles.statLabel}>Salas Favoritas</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{userStats.timeSpent}</Text>
-          <Text style={styles.statLabel}>Tempo Total</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{userStats.lastLogin}</Text>
-          <Text style={styles.statLabel}>Último Acesso</Text>
-        </View>
-      </View>
-    </Animated.View>
-  );
 
   // Componente de Informações Pessoais
   const PersonalInfoSection = () => (
@@ -161,7 +165,7 @@ export default function TelaPerfil() {
       <OptionItem
         icon="person-outline"
         label="Nome Completo"
-        subtitle="João Silva Santos"
+        subtitle={userData.name}
         rightElement={
           <View style={styles.chevronContainer}>
             <Ionicons name="chevron-forward" size={16} color="#fff" />
@@ -173,7 +177,7 @@ export default function TelaPerfil() {
       <OptionItem
         icon="mail-outline"
         label="E-mail"
-        subtitle={email}
+        subtitle={userData.email}
         rightElement={
           <View style={styles.chevronContainer}>
             <Ionicons name="chevron-forward" size={16} color="#fff" />
@@ -183,9 +187,9 @@ export default function TelaPerfil() {
       />
       
       <OptionItem
-        icon="school-outline"
-        label="Curso"
-        subtitle="Engenharia de Software"
+        icon="call-outline"
+        label="Telefone"
+        subtitle={userData.phone}
         rightElement={
           <View style={styles.chevronContainer}>
             <Ionicons name="chevron-forward" size={16} color="#fff" />
@@ -195,9 +199,9 @@ export default function TelaPerfil() {
       />
       
       <OptionItem
-        icon="calendar-outline"
-        label="Ano de Ingresso"
-        subtitle="2023"
+        icon="location-outline"
+        label="Endereço"
+        subtitle={userData.address}
         rightElement={
           <View style={styles.chevronContainer}>
             <Ionicons name="chevron-forward" size={16} color="#fff" />
@@ -208,102 +212,32 @@ export default function TelaPerfil() {
     </Animated.View>
   );
 
-  // Componente de Acessibilidade
-  const AccessibilitySection = () => (
-    <Animated.View style={[styles.sectionCard, { opacity: fadeAnim }]}>
-      <Text style={styles.sectionTitle}>Acessibilidade</Text>
-      
-      <OptionItem
-        icon="text-outline"
-        label="Tamanho da Fonte"
-        subtitle={`${fontSize}px`}
-        rightElement={
-          <View style={styles.fontSizeControls}>
-            <TouchableOpacity 
-              onPress={() => {
-                setFontSize(Math.max(12, fontSize - 2));
-                triggerHaptic('light');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="remove-circle-outline" size={20} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.fontSizeText}>{fontSize}px</Text>
-            <TouchableOpacity 
-              onPress={() => {
-                setFontSize(Math.min(24, fontSize + 2));
-                triggerHaptic('light');
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="add-circle-outline" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        }
-      />
-      
-      <OptionItem
-        icon="phone-portrait-outline"
-        label="Feedback Háptico"
-        subtitle="Vibração ao tocar"
-        rightElement={
-          <View style={styles.switchWrapper}>
-            <Switch 
-              value={hapticFeedback} 
-              onValueChange={setHapticFeedback}
-              trackColor={{ false: '#4a4a4a', true: '#007AFF' }}
-              thumbColor={hapticFeedback ? '#fff' : '#f4f3f4'}
-              ios_backgroundColor="#4a4a4a"
-            />
-          </View>
-        }
-      />
-      
-      <OptionItem
-        icon="contrast-outline"
-        label="Alto Contraste"
-        subtitle="Melhor visibilidade"
-        rightElement={
-          <View style={styles.switchWrapper}>
-            <Switch 
-              value={false} 
-              onValueChange={() => triggerHaptic('medium')}
-              trackColor={{ false: '#4a4a4a', true: '#007AFF' }}
-              thumbColor="#f4f3f4"
-              ios_backgroundColor="#4a4a4a"
-            />
-          </View>
-        }
-      />
-      
-      <OptionItem
-        icon="eye-outline"
-        label="Leitor de Tela"
-        subtitle="Navegação por voz"
-        rightElement={
-          <View style={styles.switchWrapper}>
-            <Switch 
-              value={false} 
-              onValueChange={() => triggerHaptic('medium')}
-              trackColor={{ false: '#4a4a4a', true: '#007AFF' }}
-              thumbColor="#f4f3f4"
-              ios_backgroundColor="#4a4a4a"
-            />
-          </View>
-        }
-      />
-    </Animated.View>
-  );
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     triggerHaptic('heavy');
     Alert.alert(
       "Sair da Conta",
       "Tem certeza que deseja sair?",
       [
         { text: "Cancelar", style: "cancel" },
-        { text: "Sair", style: "destructive", onPress: () => console.log("Usuário saiu") },
+        { 
+          text: "Sair", 
+          style: "destructive", 
+          onPress: async () => {
+            try {
+              // Limpar dados de login do AsyncStorage
+              await AsyncStorage.removeItem('userToken');
+              await AsyncStorage.removeItem('userEmail');
+              console.log("Usuário saiu - dados limpos");
+              
+              // Redirecionar para a página inicial
+              // O useFocusEffect na página inicial vai detectar a mudança
+            } catch (error) {
+              console.log("Erro ao fazer logout:", error);
+            }
+          }
+        },
       ]
     );
   };
@@ -314,15 +248,9 @@ export default function TelaPerfil() {
       
       {/* Container principal com Safe Area */}
       <View style={[styles.safeArea, { paddingTop: insets.top }]}>
-        {/* Header fixo */}
-        <HeaderPerfil title="Perfil" showAvatar={false} />
+        {/* Header removido */}
 
-        <LinearGradient
-          colors={isDark ? [AppColors.backgroundDark, '#2c2c2c'] : [AppColors.primary, AppColors.secondary]}
-          style={styles.container}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
+        <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             
             {/* Avatar */}
@@ -337,49 +265,11 @@ export default function TelaPerfil() {
               </TouchableOpacity>
             </View>
 
-            <Text style={[styles.email, { fontSize }]}>{email}</Text>
+            <Text style={styles.email}>{userData.email}</Text>
 
-            {/* Estatísticas do Usuário */}
-            <UserStatsCard />
 
-            {/* Menu de Configurações */}
+            {/* Informações Pessoais */}
             <View style={styles.menuContainer}>
-              {/* Configurações Básicas */}
-              <View style={styles.menuSection}>
-                <Text style={styles.sectionTitle}>Configurações</Text>
-                
-                <View style={styles.menuItem}>
-                  <View style={styles.menuItemLeft}>
-                    <Ionicons name="moon" size={22} color="#fff" />
-                    <Text style={styles.menuItemText}>Modo Escuro</Text>
-                  </View>
-                  <View style={styles.switchWrapper}>
-                    <Switch 
-                      value={isDark} 
-                      onValueChange={toggleTheme}
-                      trackColor={{ false: '#4a4a4a', true: '#007AFF' }}
-                      thumbColor={isDark ? '#fff' : '#f4f3f4'}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.menuItem}>
-                  <View style={styles.menuItemLeft}>
-                    <Ionicons name="notifications" size={22} color="#fff" />
-                    <Text style={styles.menuItemText}>Notificações</Text>
-                  </View>
-                  <View style={styles.switchWrapper}>
-                    <Switch 
-                      value={notifications} 
-                      onValueChange={setNotifications}
-                      trackColor={{ false: '#4a4a4a', true: '#007AFF' }}
-                      thumbColor={notifications ? '#fff' : '#f4f3f4'}
-                    />
-                  </View>
-                </View>
-              </View>
-
-              {/* Informações Pessoais */}
               <View style={styles.menuSection}>
                 <Text style={styles.sectionTitle}>Perfil</Text>
                 
@@ -404,45 +294,28 @@ export default function TelaPerfil() {
                 {showPersonalInfo && <PersonalInfoSection />}
               </View>
 
-              {/* Acessibilidade */}
+              {/* Conta */}
               <View style={styles.menuSection}>
-                <Text style={styles.sectionTitle}>Acessibilidade</Text>
+                <Text style={styles.sectionTitle}>Conta</Text>
                 
                 <TouchableOpacity 
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setShowAccessibility(!showAccessibility);
-                    triggerHaptic('medium');
-                  }}
+                  style={[styles.menuItem, styles.logoutMenuItem]}
+                  onPress={handleLogout}
                   activeOpacity={0.7}
                 >
                   <View style={styles.menuItemLeft}>
-                    <Ionicons name="accessibility" size={22} color="#fff" />
-                    <Text style={styles.menuItemText}>Configurações</Text>
+                    <Ionicons name="log-out" size={22} color="#FF4444" />
+                    <Text style={[styles.menuItemText, styles.logoutText]}>Sair da Conta</Text>
                   </View>
-                  <Ionicons 
-                    name={showAccessibility ? "chevron-up" : "chevron-down"} 
-                    size={20} 
-                    color="#fff" 
-                  />
+                  <Ionicons name="chevron-forward" size={20} color="#FF4444" />
                 </TouchableOpacity>
-                {showAccessibility && <AccessibilitySection />}
               </View>
 
             </View>
             
-            {/* Botão de Sair */}
-            <TouchableOpacity 
-              style={styles.logoutButton}
-              onPress={handleLogout}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="log-out" size={24} color="#ff4444" />
-              <Text style={styles.logoutButtonText}>Sair da Conta</Text>
-            </TouchableOpacity>
 
           </ScrollView>
-        </LinearGradient>
+        </View>
       </View>
 
       {/* BottomNav fixo no final - fora do container principal */}
@@ -454,12 +327,15 @@ export default function TelaPerfil() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: AppColors.primary,
   },
   safeArea: {
     flex: 1,
   },
-  container: { flex: 1 },
+  container: { 
+    flex: 1,
+    backgroundColor: AppColors.primary,
+  },
   scrollContent: {
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -607,24 +483,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.15)',
-    borderRadius: 12,
+  logoutMenuItem: {
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(255, 68, 68, 0.3)',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 30,
   },
-  logoutButtonText: {
-    fontSize: 16,
+  logoutText: {
+    color: '#FF4444',
     fontWeight: '600',
-    color: '#ff4444',
-    marginLeft: 8,
   },
   fontSizeControls: {
     flexDirection: 'row',

@@ -1,15 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  Keyboard,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Keyboard,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { AppColors } from '../constants/theme';
 
 interface Sala {
   nome: string;
@@ -81,7 +82,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
-          <Ionicons name="search" size={20} color="#667eea" style={styles.searchIcon} />
+          <Ionicons name="search" size={20} color={AppColors.primary} style={styles.searchIcon} />
           <TextInput
             style={styles.input}
             placeholder="Digite o nome da sala..."
@@ -95,7 +96,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
           />
           {searchText.length > 0 && (
             <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-              <Ionicons name="close-circle" size={20} color="#667eea" />
+              <Ionicons name="close-circle" size={20} color={AppColors.primary} />
             </TouchableOpacity>
           )}
         </View>
@@ -115,7 +116,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ salas, onSearch, onSalaSelect }) 
                 style={styles.suggestionItem}
                 onPress={() => handleSuggestionPress(item)}
               >
-                <Ionicons name="location" size={16} color="#667eea" />
+                <Ionicons name="location" size={16} color={AppColors.primary} />
                 <Text style={styles.suggestionText}>{item.nome}</Text>
               </TouchableOpacity>
             )}
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    shadowColor: '#667eea',
+    shadowColor: AppColors.primary,
     shadowOffset: {
       width: 0,
       height: 0,
@@ -159,11 +160,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 1,
     borderRadius: 30,
-    backgroundColor: 'rgba(102, 126, 234, 0.05)',
+    backgroundColor: AppColors.primary + '10',
   },
   searchIcon: {
     marginRight: 10,
-    color: '#667eea',
+    color: AppColors.primary,
   },
   input: {
     flex: 1,
@@ -174,14 +175,14 @@ const styles = StyleSheet.create({
   clearButton: {
     padding: 10,
     borderRadius: 10,
-    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+    backgroundColor: AppColors.primary + '20',
   },
   searchButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: AppColors.primary,
     borderRadius: 24,
     padding: 10,
     marginLeft: 8,
-    shadowColor: '#667eea',
+    shadowColor: AppColors.primary,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     marginTop: 8,
-    shadowColor: '#667eea',
+    shadowColor: AppColors.primary,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     maxHeight: 200,
     zIndex: 300,
     borderWidth: 1,
-    borderColor: 'rgba(102, 126, 234, 0.1)',
+    borderColor: AppColors.primary + '20',
   },
   suggestionsList: {
     maxHeight: 200,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(102, 126, 234, 0.1)',
+    borderBottomColor: AppColors.primary + '20',
   },
   suggestionText: {
     marginLeft: 10,

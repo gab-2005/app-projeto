@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -29,13 +30,33 @@ export default function telaLogin () {
   const [isChecked, setItChecked] = useState(false);
 
   //Função de envio
-  async function handleSignIn() {
+  async function handleSignIn(data: any) {
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      // Simular login bem-sucedido
+      const userToken = 'token_' + Date.now(); // Token simulado
+      
+      // Salvar dados de login no AsyncStorage
+      await AsyncStorage.setItem('userToken', userToken);
+      await AsyncStorage.setItem('userEmail', data.email);
+      
+      // Salvar dados básicos se não existirem
+      const existingName = await AsyncStorage.getItem('userName');
+      if (!existingName) {
+        await AsyncStorage.setItem('userName', 'Usuário');
+        await AsyncStorage.setItem('userPhone', '(11) 99999-9999');
+        await AsyncStorage.setItem('userAddress', 'Endereço não informado');
+      }
+      
+      setTimeout(() => {
+        setLoading(false);
+        router.replace('/');
+      }, 2000);
+    } catch (error) {
+      console.log('Erro ao fazer login:', error);
       setLoading(false);
-      router.replace('/');
-    }, 2000);
+    }
   } 
 
   return (
@@ -61,7 +82,7 @@ export default function telaLogin () {
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.email && 1,
-            borderColor: errors.email && '#ff375b',
+            borderColor: errors.email && AppColors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -75,7 +96,7 @@ export default function telaLogin () {
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.password && 1,
-            borderColor: errors.password && '#ff375b',
+            borderColor: errors.password && AppColors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -181,7 +202,7 @@ const styles = StyleSheet.create({
   labelError: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    color: '#ff375b',
+    color: AppColors.primary,
     marginBottom: 8,
   },
   row: {

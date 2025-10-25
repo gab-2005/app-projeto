@@ -13,7 +13,6 @@ import {
 import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
-import HeaderPerfil from '../components/HeaderPerfil';
 import SearchBar from '../components/SearchBar';
 
 const { width, height } = Dimensions.get('window');
@@ -23,42 +22,42 @@ interface Sala {
   imagem: string;
 }
 
-// Dados das salas - todas usando mapa1.png por enquanto
+// Dados das salas - usando as imagens específicas de cada sala
 const salas: Sala[] = [
   // Salas C (101c a 105c)
-  { nome: "Sala 101C", imagem: "mapa1.png" },
-  { nome: "Sala 102C", imagem: "mapa1.png" },
-  { nome: "Sala 103C", imagem: "mapa1.png" },
-  { nome: "Sala 104C", imagem: "mapa1.png" },
-  { nome: "Sala 105C", imagem: "mapa1.png" },
+  { nome: "Sala 101C", imagem: "sala101c.jpg" },
+  { nome: "Sala 102C", imagem: "sala102c.jpg" },
+  { nome: "Sala 103C", imagem: "sala103c.jpg" },
+  { nome: "Sala 104C", imagem: "sala104c.jpg" },
+  { nome: "Sala 105C", imagem: "sala105c.jpg" },
   
   // Salas D (101d a 109d)
-  { nome: "Sala 101D", imagem: "mapa1.png" },
-  { nome: "Sala 102D", imagem: "mapa1.png" },
-  { nome: "Sala 103D", imagem: "mapa1.png" },
-  { nome: "Sala 104D", imagem: "mapa1.png" },
-  { nome: "Sala 105D", imagem: "mapa1.png" },
-  { nome: "Sala 106D", imagem: "mapa1.png" },
-  { nome: "Sala 107D", imagem: "mapa1.png" },
-  { nome: "Sala 108D", imagem: "mapa1.png" },
-  { nome: "Sala 109D", imagem: "mapa1.png" },
+  { nome: "Sala 101D", imagem: "sala101d.jpg" },
+  { nome: "Sala 102D", imagem: "sala102d.jpg" },
+  { nome: "Sala 103D", imagem: "sala103d.jpg" },
+  { nome: "Sala 104D", imagem: "sala104d.jpg" },
+  { nome: "Sala 105D", imagem: "sala105d.jpg" },
+  { nome: "Sala 106D", imagem: "sala106d.jpg" },
+  { nome: "Sala 107D", imagem: "sala107d.jpg" },
+  { nome: "Sala 108D", imagem: "sala108d.jpg" },
+  { nome: "Sala 109D", imagem: "sala109d.jpg" },
   
   // Salas E (101e a 110e)
-  { nome: "Sala 101E", imagem: "mapa1.png" },
-  { nome: "Sala 102E", imagem: "mapa1.png" },
-  { nome: "Sala 103E", imagem: "mapa1.png" },
-  { nome: "Sala 104E", imagem: "mapa1.png" },
-  { nome: "Sala 105E", imagem: "mapa1.png" },
-  { nome: "Sala 106E", imagem: "mapa1.png" },
-  { nome: "Sala 107E", imagem: "mapa1.png" },
-  { nome: "Sala 108E", imagem: "mapa1.png" },
-  { nome: "Sala 109E", imagem: "mapa1.png" },
-  { nome: "Sala 110E", imagem: "mapa1.png" },
+  { nome: "Sala 101E", imagem: "sala101e.jpg" },
+  { nome: "Sala 102E", imagem: "sala102e.jpg" },
+  { nome: "Sala 103E", imagem: "sala103e.jpg" },
+  { nome: "Sala 104E", imagem: "sala104e.jpg" },
+  { nome: "Sala 105E", imagem: "sala105e.jpg" },
+  { nome: "Sala 106E", imagem: "sala106e.jpg" },
+  { nome: "Sala 107E", imagem: "sala107e.jpg" },
+  { nome: "Sala 108E", imagem: "sala108e.jpg" },
+  { nome: "Sala 109E", imagem: "sala109e.jpg" },
+  { nome: "Sala 110E", imagem: "sala110e.jpg" },
   
   // Áreas especiais
-  { nome: "Biblioteca", imagem: "mapa1.png" },
-  { nome: "Auditório", imagem: "mapa1.png" },
-  { nome: "Banheiro", imagem: "mapa1.png" },
+  { nome: "Biblioteca", imagem: "biblioteca.jpg" },
+  { nome: "Auditório", imagem: "auditorio.jpg" },
+  { nome: "Banheiro", imagem: "banheiro.jpg" },
 ];
 
 // Função para obter a imagem correta
@@ -68,68 +67,65 @@ const getImageSource = (imageName: string) => {
     case 'mapa1.png':
       return require('../assets/images/mapa1.png');
     
-    // Salas C - por enquanto todas usam mapa1.png
-    case 'sala101c.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala102c.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala103c.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala104c.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala105c.png':
-      return require('../assets/images/mapa1.png');
+    // Salas C - usando as imagens específicas
+    case 'sala101c.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala101c.jpg');
+    case 'sala102c.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala102c.jpg');
+    case 'sala103c.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala103c.jpg');
+    case 'sala104c.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala104c.jpg');
+    case 'sala105c.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala105c.jpg');
     
-    // Salas D - por enquanto todas usam mapa1.png
-    case 'sala101d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala102d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala103d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala104d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala105d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala106d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala107d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala108d.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala109d.png':
-      return require('../assets/images/mapa1.png');
+    // Salas D - usando as imagens específicas
+    case 'sala101d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala101d.jpg');
+    case 'sala102d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala102d.jpg');
+    case 'sala103d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala103d.jpg');
+    case 'sala104d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala104d.jpg');
+    case 'sala105d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala105d.jpg');
+    case 'sala106d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala106d.jpg');
+    case 'sala107d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala107d.jpg');
+    case 'sala108d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala108d.jpg');
+    case 'sala109d.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala109d.jpg');
     
-    // Salas E - por enquanto todas usam mapa1.png
-    case 'sala101e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala102e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala103e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala104e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala105e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala106e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala107e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala108e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala109e.png':
-      return require('../assets/images/mapa1.png');
-    case 'sala110e.png':
-      return require('../assets/images/mapa1.png');
+    // Salas E - usando as imagens específicas
+    case 'sala101e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala101e.jpg');
+    case 'sala102e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala102e.jpg');
+    case 'sala103e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala103e.jpg');
+    case 'sala104e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala104e.jpg');
+    case 'sala105e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala105e.jpg');
+    case 'sala106e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala106e.jpg');
+    case 'sala107e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala107e.jpg');
+    case 'sala108e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala108e.jpg');
+    case 'sala109e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala109e.jpg');
+    case 'sala110e.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/sala110e.jpg');
     
-    // Áreas especiais - por enquanto todas usam mapa1.png
-    case 'biblioteca.png':
-      return require('../assets/images/mapa1.png');
-    case 'auditorio.png':
-      return require('../assets/images/mapa1.png');
-    case 'banheiro.png':
-      return require('../assets/images/mapa1.png');
-    
+    // Áreas especiais - usando as imagens específicas
+    case 'auditorio.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/auditorio.jpg'); 
+    case 'banheiro.jpg':
+      return require('../assets/images/mapeamento das salas - projeto mobile/banheiro.jpg');
     default:
       return require('../assets/images/mapa1.png');
   }
@@ -206,26 +202,32 @@ export default function MapaScreen() {
 
 
   
-  // Função para calcular limites rigorosos da tela - melhorada para evitar sair da tela
+  // Função para calcular limites rigorosos da tela - centralizada entre SearchBar e BottomNav
   const getScreenLimits = (currentScale: number) => {
     const imageWidth = width;
-    const imageHeight = height * 0.4; // Ajustado para nova altura
+    // Altura dinâmica baseada no espaço disponível
+    const imageHeight = height - 200; // Espaço total menos SearchBar + BottomNav
     const scaledWidth = imageWidth * currentScale;
     const scaledHeight = imageHeight * currentScale;
     
-    // Área segura para não interferir com SearchBar (aproximadamente 120px do topo)
+    // Área segura considerando SearchBar e BottomNav
     const searchBarHeight = 120;
-    const availableHeight = height - searchBarHeight;
+    const bottomNavHeight = 80;
+    const availableHeight = height - searchBarHeight - bottomNavHeight;
     
-    // Calcular limites para manter imagem sempre visível
+    // Calcular limites para manter imagem sempre visível e centralizada
     const maxTranslateX = Math.max(0, (scaledWidth - width) / 2);
     const maxTranslateY = Math.max(0, (scaledHeight - availableHeight) / 2);
     
-    // Limites mais rigorosos - sempre manter o mapa visível e respeitar SearchBar
-    const strictMinX = Math.min(-maxTranslateX, -width * 0.15); // Máximo 15% da tela para fora
-    const strictMaxX = Math.max(maxTranslateX, width * 0.15);   // Máximo 15% da tela para fora
-    const strictMinY = Math.min(-maxTranslateY, -height * 0.05); // Máximo 5% da tela para fora (mais restritivo)
-    const strictMaxY = Math.max(maxTranslateY, height * 0.05);   // Máximo 5% da tela para fora (mais restritivo)
+    // Limites adaptativos baseados no tamanho da tela
+    const horizontalLimit = width * 0.25; // 25% da largura da tela
+    const verticalLimit = availableHeight * 0.1; // 10% da altura disponível
+    
+    // Limites mais rigorosos - sempre manter o mapa visível e centralizado
+    const strictMinX = Math.min(-maxTranslateX, -horizontalLimit);
+    const strictMaxX = Math.max(maxTranslateX, horizontalLimit);
+    const strictMinY = Math.min(-maxTranslateY, -verticalLimit);
+    const strictMaxY = Math.max(maxTranslateY, verticalLimit);
     
     return {
       minX: strictMinX,
@@ -254,7 +256,7 @@ export default function MapaScreen() {
     focalX.current = 0;
     focalY.current = 0;
     
-    // Animação suave de retorno
+    // Animação suave de retorno - mantém Y sempre em 0
     Animated.parallel([
       Animated.timing(scale, {
         toValue: 1,
@@ -271,7 +273,11 @@ export default function MapaScreen() {
         duration: 400,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(() => {
+      // Garantir que Y sempre fique em 0 após animação
+      translateY.setValue(0);
+      baseTranslateY.current = 0;
+    });
   };
 
   const resetMap = () => {
@@ -290,22 +296,20 @@ export default function MapaScreen() {
     
     // Capturar ponto focal (onde o usuário tocou)
     focalX.current = gestureFocalX - width / 2;
-    focalY.current = gestureFocalY - (height * 0.4) / 2;
+    focalY.current = 0; // Sempre centralizado verticalmente
     
     // Aplicar zoom com limites mais restritivos
     const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, gestureScale));
     
-    // Removido: feedback háptico desnecessário
-    
-    // Calcular translação para manter foco no ponto tocado
+    // Calcular translação para manter foco no ponto tocado - APENAS HORIZONTAL
     const scaleFactor = newScale - 1;
     const newTranslateX = -focalX.current * scaleFactor;
-    const newTranslateY = -focalY.current * scaleFactor;
+    const newTranslateY = 0; // Sempre centralizado verticalmente
     
     // Aplicar limites da tela com mais precisão
     const limits = getScreenLimits(newScale);
     const clampedTranslateX = Math.max(limits.minX, Math.min(limits.maxX, newTranslateX));
-    const clampedTranslateY = Math.max(limits.minY, Math.min(limits.maxY, newTranslateY));
+    const clampedTranslateY = 0; // Sempre centralizado
     
     // Aplicar transformações com suavização
     scale.setValue(newScale);
@@ -315,15 +319,17 @@ export default function MapaScreen() {
     // Atualizar valores base imediatamente
     baseScale.current = newScale;
     baseTranslateX.current = clampedTranslateX;
-    baseTranslateY.current = clampedTranslateY;
-    
-    // Removido: animação desnecessária do indicador
+    baseTranslateY.current = 0; // Sempre centralizado
   };
 
   const onPinchHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
       const currentZoom = baseScale.current;
       setIsZooming(false);
+      
+      // Garantir que Y sempre fique em 0 após qualquer zoom
+      translateY.setValue(0);
+      baseTranslateY.current = 0;
       
       // Retornar automaticamente se expandir demais (para não bagunçar layout)
       if (currentZoom < RESET_THRESHOLD) {
@@ -335,34 +341,42 @@ export default function MapaScreen() {
       }
       // Manter zoom se estiver dentro dos limites aceitáveis
       else {
-        // Removido: feedback háptico desnecessário
+        // Garantir posição vertical fixa
+        translateY.setValue(0);
+        baseTranslateY.current = 0;
       }
     }
   };
 
-  // Handler de pan melhorado para evitar sair da tela
+  // Handler de pan melhorado - só permite pan após zoom e apenas horizontal
   const onPanGestureEvent = (event: any) => {
     const { translationX, translationY } = event.nativeEvent;
     const currentScale = baseScale.current;
+    
+    // Só permite pan se estiver com zoom (escala > 1.1)
+    if (currentScale <= 1.1) {
+      return; // Bloqueia pan quando não há zoom
+    }
     
     // Mostrar controles e atualizar tempo
     showControlsTemporarily();
     setIsPanning(true);
     
-    // Calcular nova posição
+    // Calcular nova posição - APENAS HORIZONTAL (X)
     const newTranslateX = baseTranslateX.current + translationX;
-    const newTranslateY = baseTranslateY.current + translationY;
+    // Bloqueia movimento vertical - mantém Y fixo
+    const newTranslateY = baseTranslateY.current; // Não permite movimento vertical
     
     // Aplicar limites rigorosos da tela
     const limits = getScreenLimits(currentScale);
     const clampedTranslateX = Math.max(limits.minX, Math.min(limits.maxX, newTranslateX));
-    const clampedTranslateY = Math.max(limits.minY, Math.min(limits.maxY, newTranslateY));
+    // Mantém Y sempre no centro (0)
+    const clampedTranslateY = 0;
     
-    // Validação adicional: garantir que o mapa sempre fique visível e respeite SearchBar
-    const finalTranslateX = Math.max(-width * 0.2, Math.min(width * 0.2, clampedTranslateX));
-    const finalTranslateY = Math.max(-height * 0.05, Math.min(height * 0.05, clampedTranslateY));
-    
-    // Removido: feedback háptico desnecessário
+    // Validação adicional: garantir que o mapa sempre fique visível e centralizado
+    const horizontalLimit = width * 0.25; // 25% da largura da tela
+    const finalTranslateX = Math.max(-horizontalLimit, Math.min(horizontalLimit, clampedTranslateX));
+    const finalTranslateY = 0; // Sempre centralizado verticalmente
     
     // Aplicar movimento com limites rigorosos
     translateX.setValue(finalTranslateX);
@@ -372,26 +386,33 @@ export default function MapaScreen() {
   const onPanHandlerStateChange = (event: any) => {
     if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
       const currentScale = baseScale.current;
+      
+      // Só permite pan se estiver com zoom (escala > 1.1)
+      if (currentScale <= 1.1) {
+        setIsPanning(false);
+        return; // Bloqueia pan quando não há zoom
+      }
+      
       const limits = getScreenLimits(currentScale);
       setIsPanning(false);
       
-      // Atualizar posição base com limites rigorosos
+      // Atualizar posição base - APENAS HORIZONTAL (X)
       const newBaseTranslateX = baseTranslateX.current + event.nativeEvent.translationX;
-      const newBaseTranslateY = baseTranslateY.current + event.nativeEvent.translationY;
+      // Bloqueia movimento vertical - mantém Y fixo
+      const newBaseTranslateY = 0; // Não permite movimento vertical
       
       // Aplicar limites finais rigorosos
       const clampedX = Math.max(limits.minX, Math.min(limits.maxX, newBaseTranslateX));
-      const clampedY = Math.max(limits.minY, Math.min(limits.maxY, newBaseTranslateY));
+      const clampedY = 0; // Sempre centralizado verticalmente
       
-      // Validação final: garantir que o mapa sempre fique visível e respeite SearchBar
-      baseTranslateX.current = Math.max(-width * 0.2, Math.min(width * 0.2, clampedX));
-      baseTranslateY.current = Math.max(-height * 0.05, Math.min(height * 0.05, clampedY));
+      // Validação final: garantir que o mapa sempre fique visível e centralizado
+      const horizontalLimit = width * 0.25; // 25% da largura da tela
+      baseTranslateX.current = Math.max(-horizontalLimit, Math.min(horizontalLimit, clampedX));
+      baseTranslateY.current = 0; // Sempre centralizado verticalmente
       
       // Atualizar valores finais
       translateX.setValue(baseTranslateX.current);
       translateY.setValue(baseTranslateY.current);
-      
-      // Removido: feedback háptico desnecessário
     }
   };
 
@@ -401,8 +422,7 @@ export default function MapaScreen() {
       
       {/* Container principal com Safe Area */}
       <View style={[styles.container, { paddingTop: safeTop }]}>
-        {/* Header fixo */}
-        <HeaderPerfil title="Mapa" />
+        {/* Header removido */}
 
       {/* Search Bar Moderna */}
       <View style={styles.searchContainer}>
@@ -541,28 +561,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
     zIndex: 1,
-    paddingTop: 10, // Adiciona espaço no topo
+    // Espaçamento dinâmico para centralizar entre SearchBar e BottomNav
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   gestureContainer: {
     flex: 1,
   },
   mapWrapper: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-start', // Mudado de 'center' para 'flex-start' para subir a imagem
     alignItems: 'center',
-    paddingTop: 50,
+    // Centralização perfeita entre SearchBar e BottomNav
+    paddingTop: 40, // Adiciona padding no topo para subir a imagem
+    paddingBottom: 0,
+    // Garantir que ocupe todo o espaço disponível
+    minHeight: height - 200, // Altura total menos espaço dos elementos fixos
   },
   mapImage: {
     width: width,
-    height: height * 0.4, // Reduzido para 0.4 para subir a imagem e evitar scroll
+    // Altura reduzida para subir a imagem
+    height: height - 250, // Reduzido de 200 para 250 para subir mais
     justifyContent: 'center',
     alignItems: 'center',
+    // Centralização absoluta para qualquer dispositivo
+    position: 'relative',
   },
   mapImageBackground: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    // Garantir centralização em qualquer tela
+    resizeMode: 'contain',
   },
   // Removido: estilos do indicador de zoom
   clearSelectionButton: {

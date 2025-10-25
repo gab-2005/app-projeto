@@ -3,7 +3,6 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import HeaderPerfil from '../components/HeaderPerfil';
 import { AppColors } from '../constants/theme';
 
 export default function TelaDetalhes() {
@@ -13,7 +12,7 @@ export default function TelaDetalhes() {
   return (
     <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <HeaderPerfil title="Detalhes" />
+      {/* Header removido */}
       <View style={styles.container}>
         <Text style={styles.text}>Tela de Detalhes</Text>
         <BotaoCustomizado title="Voltar" onPress={() => router.back()} />
