@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleProp, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
-import { AppColors } from '../constants/theme';
+// AppColors removido - usando cores dinâmicas
+import { useAppTheme } from './ThemeContext';
 
 
 type BotaoCustomizadoProps = {
@@ -13,6 +14,13 @@ type BotaoCustomizadoProps = {
 
 
 const BotaoCustomizado: React.FC<BotaoCustomizadoProps> = ({ title, onPress, style, textStyle, disabled }) => {
+  const { vibrate } = useAppTheme();
+
+  const handlePress = () => {
+    vibrate();
+    onPress();
+  };
+
   return (
     // Agora o 'style' é aplicado diretamente ao Pressable, que é a área clicável.
     <Pressable
@@ -22,7 +30,7 @@ const BotaoCustomizado: React.FC<BotaoCustomizadoProps> = ({ title, onPress, sty
         disabled && styles.buttonDisabled, // Estilo quando desabilitado
         pressed && styles.buttonPressed, // Estilo quando pressionado
       ]}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
     >
     <Text style={[styles.text, textStyle]}>
@@ -36,7 +44,7 @@ const BotaoCustomizado: React.FC<BotaoCustomizadoProps> = ({ title, onPress, sty
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: AppColors.buttonPrimary,
+    backgroundColor: '#7e57c2',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 8,
@@ -44,7 +52,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 10,
     width: '100%',
-    shadowColor: AppColors.primary,
+    shadowColor: '#7e57c2',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -54,12 +62,12 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   text: {
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   buttonDisabled: {
-    backgroundColor: AppColors.buttonDisabled,
+    backgroundColor: '#CCCCCC',
   },
   buttonPressed: {
     opacity: 0.8,

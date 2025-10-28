@@ -14,6 +14,7 @@ import { GestureHandlerRootView, PanGestureHandler, PinchGestureHandler, State }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
+import { useSettings } from '../hooks/useSettings';
 
 const { width, height } = Dimensions.get('window');
 
@@ -133,6 +134,7 @@ const getImageSource = (imageName: string) => {
 
 
 export default function MapaScreen() {
+  const { colors, vibrate } = useSettings();
   const [selectedSala, setSelectedSala] = useState<Sala | null>(null);
   const [currentImage, setCurrentImage] = useState<string>("mapa1.png");
   const [isZooming, setIsZooming] = useState(false);
@@ -416,8 +418,23 @@ export default function MapaScreen() {
     }
   };
 
+  // Estilos dinâmicos baseados no tema
+  const dynamicStyles = StyleSheet.create({
+    mainContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    mapContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+      zIndex: 1,
+      paddingTop: 10,
+      paddingBottom: 10,
+    },
+  });
+
   return (
-    <View style={styles.mainContainer}>
+    <View style={dynamicStyles.mainContainer}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       {/* Container principal com Safe Area */}
@@ -434,7 +451,7 @@ export default function MapaScreen() {
       </View>
 
       {/* Mapa Container */}
-      <View style={styles.mapContainer}>
+      <View style={dynamicStyles.mapContainer}>
         <GestureHandlerRootView style={styles.gestureContainer}>
           {/* Removido: indicador de gestos que causava fibrilação */}
           
@@ -478,22 +495,7 @@ export default function MapaScreen() {
 
       {/* Removido: indicador de zoom que causava fibrilação */}
 
-      {/* Indicador de Sala Selecionada - simplificado */}
-      {selectedSala && (
-        <Animated.View 
-          style={[
-            styles.imageIndicator, 
-            { 
-              top: safeTop + 50,
-              opacity: controlsOpacity
-            }
-          ]}
-        >
-          <Text style={styles.imageText}>
-            {selectedSala.nome}
-          </Text>
-        </Animated.View>
-      )}
+      {/* Indicador de Sala Selecionada - removido */}
 
 
 
@@ -540,7 +542,6 @@ export default function MapaScreen() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
   },
   container: {
     flex: 1,
@@ -559,10 +560,9 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
     zIndex: 1,
-    // Espaçamento dinâmico para centralizar entre SearchBar e BottomNav
-    paddingTop: 10,
+    // Espaçamento reduzido para subir mais a imagem
+    paddingTop: 0, // Removido padding para subir mais
     paddingBottom: 10,
   },
   gestureContainer: {
@@ -573,15 +573,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start', // Mudado de 'center' para 'flex-start' para subir a imagem
     alignItems: 'center',
     // Centralização perfeita entre SearchBar e BottomNav
-    paddingTop: 40, // Adiciona padding no topo para subir a imagem
+    paddingTop: 10, // Reduzido de 40 para 10 para subir mais a imagem
     paddingBottom: 0,
     // Garantir que ocupe todo o espaço disponível
     minHeight: height - 200, // Altura total menos espaço dos elementos fixos
   },
   mapImage: {
     width: width,
-    // Altura reduzida para subir a imagem
-    height: height - 250, // Reduzido de 200 para 250 para subir mais
+    // Altura ainda mais reduzida para subir a imagem
+    height: 500, // Reduzido de 250 para 300 para subir ainda mais
     justifyContent: 'center',
     alignItems: 'center',
     // Centralização absoluta para qualquer dispositivo

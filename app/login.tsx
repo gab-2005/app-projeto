@@ -8,7 +8,7 @@ import { ActivityIndicator, Image, StatusBar, StyleSheet, Switch, Text, TextInpu
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 import BotaoCustomizado from '../components/buttons';
-import { AppColors } from '../constants/theme';
+import { useSettings } from '../hooks/useSettings';
 
 
 //Validações
@@ -20,6 +20,7 @@ const schema = yup.object({
 
 export default function telaLogin () {
   const router = useRouter();
+  const { colors, vibrate } = useSettings();
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema)
@@ -82,12 +83,12 @@ export default function telaLogin () {
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.email && 1,
-            borderColor: errors.email && AppColors.primary,
+            borderColor: errors.email && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
           placeholder='seuemail@souunisuam.com.br'
-          placeholderTextColor={AppColors.textLight} 
+          placeholderTextColor={colors.text + '60'} 
           accessibilityLabel='Campo de e-mail' />
         )} />
         {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
@@ -96,12 +97,12 @@ export default function telaLogin () {
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.password && 1,
-            borderColor: errors.password && AppColors.primary,
+            borderColor: errors.password && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
           placeholder='Insira sua senha'
-          placeholderTextColor={AppColors.textLight}
+          placeholderTextColor={colors.text + '60'}
           accessibilityLabel='Campo de senha'
           secureTextEntry={true} />
         )} />
@@ -111,8 +112,8 @@ export default function telaLogin () {
           <Switch
             value={isChecked}
             onValueChange={setItChecked}
-            trackColor={{ false: AppColors.border, true: AppColors.primary }}
-            thumbColor={isChecked ? AppColors.textWhite : AppColors.borderLight}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={isChecked ? '#FFFFFF' : colors.border}
             accessible= {true}
             accessibilityLabel='Mantenha-me conectado'
             accessibilityHint="Ativa ou desativa se manter conectado no app"
@@ -167,22 +168,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontWeight: 800,
     width: '100%',
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
   },
   text2: {
     fontSize: 16,
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
   },
   input: {
     fontSize: 18,
     width: '100%',
-    borderColor: AppColors.border,
+    borderColor: '#E0E0E0',
     borderWidth: 1,
     margin: 12,
     padding: 10,
     borderRadius: 10,
-    color: AppColors.textPrimary,
-    backgroundColor: AppColors.backgroundCard,
+    color: '#333333',
+    backgroundColor: '#FFFFFF',
   },
   button: {
     width: "100%",
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     bottom: 10,
+    borderWidth: 0,
   },
   buttonText: {
     color: '#fff',
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
   labelError: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    color: AppColors.primary,
+    color: '#7e57c2',
     marginBottom: 8,
   },
   row: {

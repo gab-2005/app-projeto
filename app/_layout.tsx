@@ -16,6 +16,7 @@ export default function RootLayout() {
         <Stack.Screen name="historico" options={{ headerShown: false }} />
         <Stack.Screen name="detalhes" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ headerShown: false }} />
+        <Stack.Screen name="configuracoes" options={{ headerShown: false }} />
       </Stack>
     </AppThemeProvider>
   );

@@ -2,25 +2,26 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    Alert,
-    Animated,
-    Dimensions,
-    Image,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    Vibration,
-    View
+  Alert,
+  Animated,
+  Dimensions,
+  Image,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
 import { useAppTheme } from '../../components/ThemeContext';
-import { AppColors } from '../../constants/theme';
+// AppColors removido - usando cores dinâmicas
 import { useAvatar } from '../../hooks/useAvatar';
 
 const { width } = Dimensions.get('window');
@@ -32,9 +33,10 @@ export default function TelaPerfil() {
     phone: "(11) 99999-9999",
     address: "Rua das Flores, 123 - São Paulo, SP"
   });
-  const { isDark, toggleTheme } = useAppTheme();
+  const { isDark, toggleTheme, vibrate, colors } = useAppTheme();
   const insets = useSafeAreaInsets();
   const { avatar, pickImage } = useAvatar();
+  const router = useRouter();
   
   // Estados essenciais para funcionalidades reais
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
@@ -146,7 +148,7 @@ export default function TelaPerfil() {
           <View style={styles.optionLeft}>
             <Ionicons name={icon as any} size={22} color={color} style={{ marginRight: 10 }} />
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color }]}>{label}</Text>
+              <Text style={[dynamicStyles.optionText, { color }]}>{label}</Text>
               {subtitle && <Text style={styles.optionSubtitle}>{subtitle}</Text>}
             </View>
           </View>
@@ -160,7 +162,7 @@ export default function TelaPerfil() {
   // Componente de Informações Pessoais
   const PersonalInfoSection = () => (
     <Animated.View style={[styles.sectionCard, { opacity: fadeAnim }]}>
-      <Text style={styles.sectionTitle}>Informações Pessoais</Text>
+      <Text style={dynamicStyles.sectionTitle}>Informações Pessoais</Text>
       
       <OptionItem
         icon="person-outline"
@@ -242,36 +244,71 @@ export default function TelaPerfil() {
     );
   };
 
+  // Estilos dinâmicos baseados no tema
+  const dynamicStyles = StyleSheet.create({
+    mainContainer: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    email: {
+      fontSize: 16,
+      color: colors.text,
+      marginBottom: 25,
+      fontWeight: '500',
+    },
+    optionText: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    menuItemText: {
+      fontSize: 16,
+      color: colors.text,
+      marginLeft: 12,
+      fontWeight: '500',
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 12,
+      marginLeft: 4,
+    },
+  });
+
   return (
-    <View style={styles.mainContainer}>
+    <View style={dynamicStyles.mainContainer}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
       {/* Container principal com Safe Area */}
       <View style={[styles.safeArea, { paddingTop: insets.top }]}>
         {/* Header removido */}
 
-        <View style={styles.container}>
+        <View style={dynamicStyles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
             
             {/* Avatar */}
             <View style={styles.avatarWrapper}>
               <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
-                <LinearGradient colors={[AppColors.backgroundCard, AppColors.border]} style={styles.avatarBorder}>
+                <LinearGradient colors={[colors.card, colors.border]} style={styles.avatarBorder}>
                   <Image source={avatar} style={styles.avatar} />
                 </LinearGradient>
                 <View style={styles.cameraIcon}>
-                  <Ionicons name="camera" size={18} color={AppColors.textWhite} />
+                  <Ionicons name="camera" size={18} color="#FFFFFF" />
                 </View>
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.email}>{userData.email}</Text>
+            <Text style={dynamicStyles.email}>{userData.email}</Text>
 
 
             {/* Informações Pessoais */}
             <View style={styles.menuContainer}>
               <View style={styles.menuSection}>
-                <Text style={styles.sectionTitle}>Perfil</Text>
+                <Text style={dynamicStyles.sectionTitle}>Perfil</Text>
                 
                 <TouchableOpacity 
                   style={styles.menuItem}
@@ -283,7 +320,7 @@ export default function TelaPerfil() {
                 >
                   <View style={styles.menuItemLeft}>
                     <Ionicons name="person" size={22} color="#fff" />
-                    <Text style={styles.menuItemText}>Informações Pessoais</Text>
+                    <Text style={dynamicStyles.menuItemText}>Informações Pessoais</Text>
                   </View>
                   <Ionicons 
                     name={showPersonalInfo ? "chevron-up" : "chevron-down"} 
@@ -294,9 +331,29 @@ export default function TelaPerfil() {
                 {showPersonalInfo && <PersonalInfoSection />}
               </View>
 
+              {/* Configurações */}
+              <View style={styles.menuSection}>
+                <Text style={dynamicStyles.sectionTitle}>Configurações</Text>
+                
+                <TouchableOpacity 
+                  style={styles.menuItem}
+                  onPress={() => {
+                    vibrate();
+                    router.push('/configuracoes');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.menuItemLeft}>
+                    <Ionicons name="settings" size={22} color="#fff" />
+                    <Text style={dynamicStyles.menuItemText}>Configurações do App</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#fff" />
+                </TouchableOpacity>
+              </View>
+
               {/* Conta */}
               <View style={styles.menuSection}>
-                <Text style={styles.sectionTitle}>Conta</Text>
+                <Text style={dynamicStyles.sectionTitle}>Conta</Text>
                 
                 <TouchableOpacity 
                   style={[styles.menuItem, styles.logoutMenuItem]}
@@ -305,7 +362,7 @@ export default function TelaPerfil() {
                 >
                   <View style={styles.menuItemLeft}>
                     <Ionicons name="log-out" size={22} color="#FF4444" />
-                    <Text style={[styles.menuItemText, styles.logoutText]}>Sair da Conta</Text>
+                    <Text style={[dynamicStyles.menuItemText, styles.logoutText]}>Sair da Conta</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#FF4444" />
                 </TouchableOpacity>
@@ -327,14 +384,12 @@ export default function TelaPerfil() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: AppColors.primary,
   },
   safeArea: {
     flex: 1,
   },
   container: { 
     flex: 1,
-    backgroundColor: AppColors.primary,
   },
   scrollContent: {
     alignItems: 'center',
@@ -363,7 +418,6 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 16,
-    color: AppColors.textWhite,
     marginBottom: 25,
     fontWeight: '500',
   },
@@ -387,7 +441,6 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: AppColors.textWhite,
   },
   optionTextContainer: {
     flex: 1,
@@ -409,7 +462,7 @@ const styles = StyleSheet.create({
   statsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     marginBottom: 15,
     textAlign: 'center',
   },
@@ -426,7 +479,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     marginBottom: 5,
   },
   statLabel: {
@@ -445,7 +498,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -458,8 +511,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 12,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
     minHeight: 56,
   },
   menuItemLeft: {
@@ -470,7 +521,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     marginLeft: 12,
     fontWeight: '500',
   },
@@ -503,7 +554,7 @@ const styles = StyleSheet.create({
   },
   fontSizeText: {
     fontSize: 14,
-    color: AppColors.textWhite,
+    color: '#FFFFFF',
     fontWeight: '600',
     minWidth: 30,
     textAlign: 'center',

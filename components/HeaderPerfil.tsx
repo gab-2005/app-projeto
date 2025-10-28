@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
-import { AppColors } from "../constants/theme";
+// AppColors removido - usando cores dinâmicas
 import { useAvatar } from "../hooks/useAvatar";
 
 interface HeaderPerfilProps {
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: AppColors.backgroundCard,
-    shadowColor: AppColors.primary,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#7e57c2',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: '#E0E0E0',
   },
   leftSection: {
     flex: 1,
@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
   saudacao: {
     fontSize: 20,
     fontWeight: "600",
-    color: AppColors.textPrimary,
+    color: '#333333',
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: '#E0E0E0',
   },
 });

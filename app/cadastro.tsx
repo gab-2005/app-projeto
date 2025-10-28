@@ -9,7 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Image, Modal, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
-import { AppColors } from '../constants/theme';
+import { useSettings } from '../hooks/useSettings';
 
 
 //Validações
@@ -26,6 +26,7 @@ const schema = yup.object({
 
 
 export default function telaCadastro() {
+  const { colors, vibrate } = useSettings();
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema)
   });
@@ -93,7 +94,7 @@ export default function telaCadastro() {
             <Controller control={control} name='firstname' render={({ field: { onChange, onBlur, value } }) => (
               <TextInput style={[styles.input, {
                 borderWidth: errors.firstname && 1,
-                borderColor: errors.firstname && AppColors.primary
+                borderColor: errors.firstname && colors.primary
               }]} onChangeText={onChange} 
               onBlur={onBlur}
               value={value}
@@ -108,7 +109,7 @@ export default function telaCadastro() {
             <Controller control={control} name='lastname' render={({ field: { onChange, onBlur, value } }) => (
               <TextInput style={[styles.input, {
                 borderWidth: errors.lastname && 1,
-                borderColor: errors.lastname && AppColors.primary
+                borderColor: errors.lastname && colors.primary
               }]} onChangeText={onChange}
               onBlur={onBlur}
               value={value}
@@ -123,7 +124,7 @@ export default function telaCadastro() {
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.email && 1,
-            borderColor: errors.email && AppColors.primary,
+            borderColor: errors.email && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -136,7 +137,7 @@ export default function telaCadastro() {
         <Controller control={control} name='phone' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.phone && 1,
-            borderColor: errors.phone && AppColors.primary,
+            borderColor: errors.phone && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur}
           value={value} 
@@ -149,7 +150,7 @@ export default function telaCadastro() {
         <Controller control={control} name='address' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.address && 1,
-            borderColor: errors.address && AppColors.primary,
+            borderColor: errors.address && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur}
           value={value} 
@@ -162,7 +163,7 @@ export default function telaCadastro() {
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.password && 1,
-            borderColor: errors.password && AppColors.primary,
+            borderColor: errors.password && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur} //Chamado qunado o TextInput é tocado
           value={value} 
@@ -176,7 +177,7 @@ export default function telaCadastro() {
         <Controller control={control} name='confirmpass' render={({ field: { onChange, onBlur, value } }) => (
           <TextInput style={[styles.input, {
             borderWidth: errors.confirmpass && 1,
-            borderColor: errors.confirmpass && AppColors.primary,
+            borderColor: errors.confirmpass && colors.primary,
           }]} onChangeText={onChange} 
           onBlur={onBlur}
           value={value}
@@ -204,7 +205,7 @@ export default function telaCadastro() {
         <Modal visible={showSuccess} animationType="fade" transparent onRequestClose={() => setShowSuccess(false)}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Ionicons name='checkmark-circle' size={100}marginBottom={15} color={AppColors.primary}/>
+              <Ionicons name='checkmark-circle' size={100}marginBottom={15} color={colors.primary}/>
 
               <Text style={styles.modalText}>Conta criada com sucesso!</Text>
               <Text style={styles.modalSubtext}>Você será redirecionado para o login em alguns segundos...</Text>
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   labelError: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    color: AppColors.primary,
+    color: '#7e57c2',
     marginBottom: 8,
   },
   modalBackground: {
