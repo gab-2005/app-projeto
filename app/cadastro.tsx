@@ -1,15 +1,18 @@
 import BotaoCustomizado from '@/components/buttons';
 import { Ionicons } from '@expo/vector-icons'; //Ícone de check
 import { yupResolver } from '@hookform/resolvers/yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Image, Modal, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native'; // NOVO: Importa o 'Alert'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 import { useSettings } from '../hooks/useSettings';
+import { AppColors } from '../constants/theme';
+import { auth, db } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
 
 
 //Validações
@@ -18,23 +21,19 @@ const schema = yup.object({
   lastname: yup.string().required("Informe seu sobrenome."),
   email: yup.string().email("E-mail inválido!").required("Informe seu e-mail."),
   phone: yup.string().required("Informe seu telefone."),
-  address: yup.string().required("Informe seu endereço."),
   password: yup.string().min(6, "A senha deve conter pelo menos 6 dígitos.").max(14, "Senha muito longa. Menos de 14 caracteres, por favor.").required("Informe sua senha."),
-  //Criando uma comparação com o campo 'password'
   confirmpass: yup.string().oneOf([yup.ref('password')], "As senhas devem ser iguais.").required("Confirme sua senha.")
 });
 
 
 export default function telaCadastro() {
-  const { colors, vibrate } = useSettings();
+  const { colors } = useSettings();
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema)
   });
 
   const [loading, setLoading] = useState(false);
-
   const [showSuccess, setShowSuccess] = useState(false);
-
   const router = useRouter();
 
   //Função de envio
@@ -42,46 +41,63 @@ export default function telaCadastro() {
     setLoading(true);
 
     try {
-      // Simular cadastro bem-sucedido
-      const userToken = 'token_' + Date.now(); // Token simulado
-      const fullName = `${data.firstname} ${data.lastname}`;
-      
-      // Salvar dados do usuário no AsyncStorage
-      await AsyncStorage.setItem('userToken', userToken);
-      await AsyncStorage.setItem('userEmail', data.email);
-      await AsyncStorage.setItem('userName', fullName);
-      await AsyncStorage.setItem('userPhone', data.phone); // Telefone do formulário
-      await AsyncStorage.setItem('userAddress', data.address); // Endereço do formulário
-      
-      setTimeout(() => {
-        setLoading(false);
-        reset(); //Limpa os campos primeiro
-        setShowSuccess(true);
-        
-        // Redirecionar para o login após 3 segundos
-        setTimeout(() => {
-          router.replace('/login');
-        }, 3000);
-      }, 2000);
-    } catch (error) {
-      console.log('Erro ao fazer cadastro:', error);
+      //INÍCIO DA LÓGICA DO FIREBASE
+      //Criar o usuário no Authentication (só e-mail e senha)
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      //Salvar os dados extras (nome, telefone) no Firestore
+      //Remove 'password' e 'confirmpass' dos dados antes de salvar no DB
+      const userData = {
+        uid: user.uid,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        phone: data.phone,
+        email: data.email.toLowerCase() //Salvar e-mail em minúsculas
+      };
+
+      //Cria um documento na coleção "users" usando o ID do usuário como nome
+      await setDoc(doc(db, "users", user.uid), userData);
+      //FIM DA LÓGICA DO FIREBASE
+
+      //Se chegou aqui, o cadastro deu certo!
       setLoading(false);
+      reset(); //Limpa os campos
+      setShowSuccess(true);
+      
+      //Redireciona para o login após 4 segundos
+      setTimeout(() => {
+        router.replace('/login'); //---------- MUDAR PARA ('/') QUANDO A TELA LOGIN FOR O INDEX DO APP ----------
+      }, 4000);
+
+    } catch (error: any) { //Tratamento de erros do Firebase
+      console.log('Erro ao fazer cadastro:', error.code, error.message);
+      setLoading(false);
+
+      //Mostra um alerta amigável para o usuário
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Erro no cadastro', 'Este endereço de e-mail já está sendo usado por outra conta.');
+      } else if (error.code === 'auth/weak-password') {
+        Alert.alert('Erro no cadastro', 'A senha é muito fraca. Tente uma senha com pelo menos 6 caracteres.');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('Erro no cadastro', 'O endereço de e-mail fornecido é inválido.');
+      } else {
+        Alert.alert('Erro no cadastro', 'Ocorreu um erro inesperado. Tente novamente.');
+      }
     }
   } 
 
   return (
     <View style={styles.containerPrincipal}>
       <LinearGradient
-        //Cores do Gradiente (do topo para baixo)
         colors={['#9560e1', '#005c83']}
-        style={styles.gradient}
-      />
+        style={styles.gradient} />
 
       <SafeAreaView style={styles.container}>
         <StatusBar 
-          barStyle="light-content" //Deixa o texto da barra (relógio, etc.) branco
-          backgroundColor="transparent" //Cor de fundo da barra
-          translucent //Faz o app preencher a área da barra de status
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
         />
 
         <Image source={require("../assets/images/logotipo-coruja.png")} style={styles.img} />
@@ -92,14 +108,17 @@ export default function telaCadastro() {
           <View style={styles.inputContainer}>
             {/*Nome*/}
             <Controller control={control} name='firstname' render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput style={[styles.input, {
-                borderWidth: errors.firstname && 1,
-                borderColor: errors.firstname && colors.primary
-              }]} onChangeText={onChange} 
-              onBlur={onBlur}
-              value={value}
-              placeholder='Primeiro nome'
-              placeholderTextColor="black" />
+              <View style={[styles.inputFieldWrapper, {
+                borderColor: errors.firstname ? '#ff375b' : 'transparent'
+              }]}>
+                <Ionicons name="person-outline" size={24} style={styles.icon} />
+                <TextInput style={styles.input} 
+                  onChangeText={onChange} 
+                  onBlur={onBlur}
+                  value={value}
+                  placeholder='Primeiro nome'
+                  placeholderTextColor={AppColors.textLight} />
+              </View>
             )} />
             {errors.firstname && <Text style={styles.labelError}>{errors.firstname?.message}</Text>}
           </View>
@@ -107,14 +126,17 @@ export default function telaCadastro() {
           <View style={styles.inputContainer}>
             {/*Sobrenome*/}
             <Controller control={control} name='lastname' render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput style={[styles.input, {
-                borderWidth: errors.lastname && 1,
-                borderColor: errors.lastname && colors.primary
-              }]} onChangeText={onChange}
-              onBlur={onBlur}
-              value={value}
-              placeholder='Sobrenome'
-              placeholderTextColor="black" />
+              <View style={[styles.inputFieldWrapper, {
+                borderColor: errors.lastname ? '#ff375b' : 'transparent'
+              }]}>
+                <Ionicons name="person-outline" size={24} style={styles.icon} />
+                <TextInput style={styles.input} 
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  placeholder='Sobrenome'
+                  placeholderTextColor={AppColors.textLight} />
+              </View>
             )} />
             {errors.lastname && <Text style={styles.labelError}>{errors.lastname?.message}</Text>}
           </View>
@@ -122,68 +144,72 @@ export default function telaCadastro() {
 
         {/*E-mail*/}
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.email && 1,
-            borderColor: errors.email && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur} //Chamado qunado o TextInput é tocado
-          value={value} 
-          placeholder='Digite seu e-mail'
-          placeholderTextColor="black" />
+          <View style={[styles.inputFieldWrapper, {
+            borderColor: errors.email ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="mail-outline" size={24} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur} 
+              value={value} 
+              placeholder='Digite seu e-mail'
+              placeholderTextColor={AppColors.textLight}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
         )} />
         {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
 
         {/*Telefone*/}
         <Controller control={control} name='phone' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.phone && 1,
-            borderColor: errors.phone && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur}
-          value={value} 
-          placeholder='Digite seu telefone'
-          placeholderTextColor="black" />
+          <View style={[styles.inputFieldWrapper, {
+            borderColor: errors.phone ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="call-outline" size={24} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur}
+              value={value} 
+              placeholder='Digite seu telefone'
+              placeholderTextColor={AppColors.textLight}
+              keyboardType="phone-pad"
+            />
+          </View>
         )} />
         {errors.phone && <Text style={styles.labelError}>{errors.phone?.message}</Text>}
 
-        {/*Endereço*/}
-        <Controller control={control} name='address' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.address && 1,
-            borderColor: errors.address && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur}
-          value={value} 
-          placeholder='Digite seu endereço'
-          placeholderTextColor="black" />
-        )} />
-        {errors.address && <Text style={styles.labelError}>{errors.address?.message}</Text>}
-
         {/*Senha*/}
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.password && 1,
-            borderColor: errors.password && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur} //Chamado qunado o TextInput é tocado
-          value={value} 
-          placeholder='Crie uma senha'
-          placeholderTextColor="black"
-          secureTextEntry={true} />
+          <View style={[styles.inputFieldWrapper, {
+            borderColor: errors.password ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="lock-closed-outline" size={24} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur} 
+              value={value} 
+              placeholder='Crie uma senha'
+              placeholderTextColor={AppColors.textLight}
+              secureTextEntry={true} />
+          </View>
         )} />
         {errors.password && <Text style={styles.labelError}>{errors.password?.message}</Text>}
 
         {/*Confirmação senha*/}
         <Controller control={control} name='confirmpass' render={({ field: { onChange, onBlur, value } }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.confirmpass && 1,
-            borderColor: errors.confirmpass && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur}
-          value={value}
-          placeholder='Confirme a senha'
-          placeholderTextColor="black"
-          secureTextEntry={true} />
+          <View style={[styles.inputFieldWrapper, {
+            borderColor: errors.confirmpass ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="lock-closed-outline" size={24} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur}
+              value={value}
+              placeholder='Confirme a senha'
+              placeholderTextColor={AppColors.textLight}
+              secureTextEntry={true} />
+          </View>
         )} />
         {errors.confirmpass && <Text style={styles.labelError}>{errors.confirmpass?.message}</Text>}
 
@@ -255,19 +281,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    gap: 10, //Espaçamento moderno entre os dois blocos
+    gap: 10, 
   },
   inputContainer: {
-    flex: 1, //Divide igualmente o espaço
+    flex: 1, 
+  },
+  inputFieldWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AppColors.backgroundCard,
+    borderRadius: 10, 
+    width: '100%',
+    marginBottom: 12, 
+    paddingHorizontal: 10, 
+    opacity: 0.6, 
+    borderWidth: 1, 
+    borderColor: 'transparent', 
   },
   input: {
-    color: 'black',
-    backgroundColor: '#CFD9E3',
-    paddingHorizontal: 8,
-    marginBottom: 8,
-    borderRadius: 8,
-    width: '100%',
-    height: 40,
+    flex: 1, 
+    color: AppColors.textPrimary, 
+    fontSize: 18, 
+    paddingVertical: 10, 
+  },
+  icon: {
+    marginRight: 10,
+    color: AppColors.textLight, 
   },
   button: {
     width: "100%",
@@ -286,7 +325,7 @@ const styles = StyleSheet.create({
   labelError: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    color: '#7e57c2',
+    color: '#7e57c2', 
     marginBottom: 8,
   },
   modalBackground: {

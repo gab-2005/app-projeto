@@ -14,65 +14,67 @@ type BotaoCustomizadoProps = {
 
 
 const BotaoCustomizado: React.FC<BotaoCustomizadoProps> = ({ title, onPress, style, textStyle, disabled }) => {
-  const { vibrate } = useAppTheme();
+  const { vibrate, colors } = useAppTheme();
 
   const handlePress = () => {
     vibrate();
     onPress();
   };
 
+  const dynamicStyles = StyleSheet.create({
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      borderRadius: 15,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 10,
+      width: '100%',
+      height: 50,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    text: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    buttonDisabled: {
+      backgroundColor: colors.border,
+      opacity: 0.6,
+    },
+    buttonPressed: {
+      opacity: 0.8,
+    }
+  });
+
   return (
-    // Agora o 'style' é aplicado diretamente ao Pressable, que é a área clicável.
     <Pressable
       style={({ pressed }) => [
-        styles.button,
+        dynamicStyles.button,
         style,
-        disabled && styles.buttonDisabled, // Estilo quando desabilitado
-        pressed && styles.buttonPressed, // Estilo quando pressionado
+        disabled && dynamicStyles.buttonDisabled,
+        pressed && dynamicStyles.buttonPressed,
       ]}
       onPress={handlePress}
       disabled={disabled}
     >
-    <Text style={[styles.text, textStyle]}>
+      <Text style={[dynamicStyles.text, textStyle]}>
         {title}
-    </Text>
+      </Text>
     </Pressable>
   );
 };
 
 
 
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#7e57c2',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-    width: '100%',
-    shadowColor: '#7e57c2',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  text: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonDisabled: {
-    backgroundColor: '#CCCCCC',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  }
-});
 
 
 export default BotaoCustomizado;

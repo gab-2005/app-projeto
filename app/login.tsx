@@ -1,14 +1,19 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Image, StatusBar, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StatusBar, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 import BotaoCustomizado from '../components/buttons';
 import { useSettings } from '../hooks/useSettings';
+import { AppColors } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { auth } from '../firebaseConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
 
 
 //Validações
@@ -20,130 +25,137 @@ const schema = yup.object({
 
 export default function telaLogin () {
   const router = useRouter();
-  const { colors, vibrate } = useSettings();
+  const { colors } = useSettings();
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema)
   });
 
   const [loading, setLoading] = useState(false);
-
   const [isChecked, setItChecked] = useState(false);
 
   //Função de envio
-  async function handleSignIn(data: any) {
-    setLoading(true);
+ 
+ async function handleSignIn(data: any) {
+  setLoading(true);
 
-    try {
-      // Simular login bem-sucedido
-      const userToken = 'token_' + Date.now(); // Token simulado
-      
-      // Salvar dados de login no AsyncStorage
-      await AsyncStorage.setItem('userToken', userToken);
-      await AsyncStorage.setItem('userEmail', data.email);
-      
-      // Salvar dados básicos se não existirem
-      const existingName = await AsyncStorage.getItem('userName');
-      if (!existingName) {
-        await AsyncStorage.setItem('userName', 'Usuário');
-        await AsyncStorage.setItem('userPhone', '(11) 99999-9999');
-        await AsyncStorage.setItem('userAddress', 'Endereço não informado');
-      }
-      
-      setTimeout(() => {
-        setLoading(false);
-        router.replace('/');
-      }, 2000);
-    } catch (error) {
-      console.log('Erro ao fazer login:', error);
-      setLoading(false);
-    }
-  } 
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+    const user = userCredential.user;
 
+    // SALVA O USUÁRIO NO ASYNC STORAGE
+    await AsyncStorage.setItem('loggedUser', JSON.stringify({
+      uid: user.uid,
+      email: user.email
+    }));
+
+    setLoading(false);
+    reset();
+    router.replace('/'); // Vai para home
+  } catch (error: any) {
+    setLoading(false);
+    console.log('Erro no login:', error.code, error.message);
+    Alert.alert('Erro', 'E-mail ou senha inválidos. Verifique e tente novamente.');
+  }
+}
   return (
     <View style={styles.containerPrincipal}>
       <LinearGradient
-        //Cores do Gradiente (do topo para baixo)
         colors={['#9560e1', '#005c83']}
         style={styles.gradient}
       />
-      
+
       <SafeAreaView style={styles.container}>
         <StatusBar 
-          barStyle="light-content" //Deixa o texto da barra (relógio, etc.) branco
-          backgroundColor="transparent" //Cor de fundo da barra
-          translucent //Faz o app preencher a área da barra de status
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
         />
-      
-        <Image source={require("../assets/images/logotipo-coruja.png")} style={styles.img} />
-              
-        <Text style={styles.text}>Login</Text>
 
-        {/*E-mail*/}
+        <Image source={require("../assets/images/logotipo-coruja.png")} style={{
+          alignSelf: 'center',
+          width: 150, 
+          height: 100,
+          bottom: 50,
+        }} />
+
+        <Text style={styles.text}>Acesse sua conta</Text>
+
         <Controller control={control} name='email' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.email && 1,
-            borderColor: errors.email && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur} //Chamado qunado o TextInput é tocado
-          value={value} 
-          placeholder='seuemail@souunisuam.com.br'
-          placeholderTextColor={colors.text + '60'} 
-          accessibilityLabel='Campo de e-mail' />
+          <View style={[styles.inputContainer, {
+            borderColor: errors.email ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="mail-outline" size={24} color={AppColors.textLight} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur}
+              value={value} 
+              placeholder='Digite seu e-mail'
+              placeholderTextColor={AppColors.textLight}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
         )} />
         {errors.email && <Text style={styles.labelError}>{errors.email?.message}</Text>}
-        
-        {/*Senha*/}
+
         <Controller control={control} name='password' render={({ field: {onChange, onBlur, value} }) => (
-          <TextInput style={[styles.input, {
-            borderWidth: errors.password && 1,
-            borderColor: errors.password && colors.primary,
-          }]} onChangeText={onChange} 
-          onBlur={onBlur} //Chamado qunado o TextInput é tocado
-          value={value} 
-          placeholder='Insira sua senha'
-          placeholderTextColor={colors.text + '60'}
-          accessibilityLabel='Campo de senha'
-          secureTextEntry={true} />
+          <View style={[styles.inputContainer, {
+            borderColor: errors.password ? '#ff375b' : 'transparent',
+          }]}>
+            <Ionicons name="lock-closed-outline" size={24} color={AppColors.textLight} style={styles.icon} />
+            <TextInput style={styles.input} 
+              onChangeText={onChange} 
+              onBlur={onBlur}
+              value={value} 
+              placeholder='Digite sua senha'
+              placeholderTextColor={AppColors.textLight}
+              secureTextEntry={true} //Esconde a senha
+            />
+          </View>
         )} />
         {errors.password && <Text style={styles.labelError}>{errors.password?.message}</Text>}
 
-        <View style={styles.row}>
-          <Switch
-            value={isChecked}
-            onValueChange={setItChecked}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={isChecked ? '#FFFFFF' : colors.border}
-            accessible= {true}
-            accessibilityLabel='Mantenha-me conectado'
-            accessibilityHint="Ativa ou desativa se manter conectado no app"
-            accessibilityState={{checked: isChecked}}
-          />
-
-          <Text style={styles.text2}>Mantenha-me conectado</Text>
+        <View style={{
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+            <Switch 
+              trackColor={{ false: '#767577', true: colors.primary }}
+              thumbColor={isChecked ? '#FFFFFF' : colors.border}
+              onValueChange={() => setItChecked((prev) => !prev)}
+              value={isChecked}
+              accessibilityLabel='Mantenha-me conectado'
+              accessibilityHint="Ativa ou desativa se manter conectado no app"
+              accessibilityState={{checked: isChecked}}
+            />
+            <Text style={styles.text2}>Mantenha-me conectado</Text>
+          </View>
         </View>
 
-        {/*Botão 'Acessar'*/}
+        {/* Botão Acessar */}
         <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]}
           onPress={handleSubmit(handleSignIn)}
-          disabled={loading}>
+          disabled={loading}
+        >
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Entrar</Text>
+            <Text style={styles.buttonText}>Acessar</Text>
           )}
         </TouchableOpacity>
 
         <Text style={styles.text2}>Você é novo por aqui?</Text>
 
-        <Link href="/cadastro" asChild>
-          <BotaoCustomizado title='Criar uma conta' onPress={()=> 'void'}/>
-        </Link>
+        {/* Botão 'Criar conta' */}
+        <BotaoCustomizado title="Criar conta" onPress={() => router.push('/cadastro')} />
       </SafeAreaView>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   containerPrincipal: {
@@ -163,27 +175,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   text: { 
-    textAlign: 'left',
+    textAlign: 'center',
     fontSize: 30,
-    marginBottom: 16,
-    fontWeight: 800,
+    marginBottom: 10,
+    fontWeight: '800',
     width: '100%',
     color: '#FFFFFF',
   },
   text2: {
     fontSize: 16,
     color: '#FFFFFF',
+    marginTop: 5,
   },
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     fontSize: 18,
     width: '100%',
-    borderColor: '#E0E0E0',
+    borderColor: AppColors.border,
     borderWidth: 1,
     margin: 12,
-    padding: 10,
+    paddingHorizontal: 10,
     borderRadius: 10,
-    color: '#333333',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: AppColors.backgroundCard,
+    opacity: 0.6,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 18,
+    paddingVertical: 10,
+    color: AppColors.textPrimary,
   },
   button: {
     width: "100%",
@@ -192,9 +216,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
-    bottom: 10,
-    borderWidth: 0,
+    marginTop: 30
   },
   buttonText: {
     color: '#fff',
@@ -206,16 +228,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#7e57c2',
     marginBottom: 8,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  img: {
-    alignSelf: 'center',
-    width: 150, 
-    height: 100,
-    bottom: 50,
   }
 });

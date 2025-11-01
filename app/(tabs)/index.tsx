@@ -1,12 +1,14 @@
-
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Link, useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../../components/BottomNav';
 import { useSettings } from '../../hooks/useSettings';
+import { auth, db } from '../../firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -19,71 +21,73 @@ interface AppIcon {
 }
 
 export default function HomeScreen() {
-  const { colors, vibrate } = useSettings();
+  const { colors, vibrate, isDark } = useSettings();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [userName, setUserName] = useState('Usuário');
-
-  const appIcons: AppIcon[] = [
-    {
-      id: 'configuracao',
-      name: 'Personalizar',
-      icon: 'color-palette',
-      route: '/configuracoes',
-      description: 'Personalizar tema\ne cores'
-    },
-    {
-      id: 'busca',
-      name: 'Buscar',
-      icon: 'search',
-      route: '/mapa',
-      description: 'Buscar salas no mapa'
-    },
-    {
-      id: 'sobre',
-      name: 'Sobre',
-      icon: 'information-circle',
-      route: '/detalhes',
-      description: 'Informações do app'
-    }
-  ];
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
-  // Verificar status de login ao carregar a página
-  const checkLoginStatus = useCallback(async () => {
-    try {
-      const userToken = await AsyncStorage.getItem('userToken');
-      const userEmail = await AsyncStorage.getItem('userEmail');
-      setIsLoggedIn(!!userToken && !!userEmail);
-    } catch (error) {
-      console.log('Erro ao verificar status de login:', error);
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  // Verificar login quando a página ganha foco (volta do login)
-  useFocusEffect(
-    useCallback(() => {
-      checkLoginStatus();
-    }, [checkLoginStatus])
-  );
-
-  // Verificar login na montagem inicial
+  const appIcons: AppIcon[] = [
+    { id: 'configuracao', name: 'Personalizar', icon: 'color-palette', route: '/configuracoes', description: 'Personalizar tema\ne cores' },
+    { id: 'busca', name: 'Buscar', icon: 'search', route: '/mapa', description: 'Buscar salas no mapa' },
+    { id: 'sobre', name: 'Sobre', icon: 'information-circle', route: '/detalhes', description: 'Informações do app' },
+  ];
   useEffect(() => {
-    checkLoginStatus();
-  }, [checkLoginStatus]);
+  const checkUser = async () => {
+    const storedUser = await AsyncStorage.getItem('loggedUser');
 
-  const handleUserAction = () => {
-    if (isLoggedIn) {
-      // Se logado, vai para o perfil
-      router.push('/perfil');
+    if (storedUser) {
+      // Se existir usuário armazenado
+      const userData = JSON.parse(storedUser);
+      setIsLoggedIn(true);
+
+      // Buscar nome completo no Firestore
+      try {
+        const userRef = doc(db, 'users', userData.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          const fullName = `${data.firstname || ''} ${data.lastname || ''}`.trim();
+          setUserName(fullName || null);
+        }
+      } catch (err) {
+        console.log('Erro ao buscar nome do usuário:', err);
+      }
     } else {
-      // Se não logado, vai para o login
-      router.push('/login');
+      // Sem usuário armazenado → observa o Firebase
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          setIsLoggedIn(true);
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            const fullName = `${data.firstname || ''} ${data.lastname || ''}`.trim();
+            setUserName(fullName || null);
+          }
+        } else {
+          setIsLoggedIn(false);
+          setUserName(null);
+        }
+      });
+      return () => unsubscribe();
     }
   };
 
+  checkUser()
+}, []);
+
+
+
+  const handleUserAction = () => {
+    vibrate();
+    if (isLoggedIn) {
+      Alert.alert('Usuário Conectado', `Bem-vindo, ${userName || 'usuário'}!`);
+    } else {
+      router.push('/login');
+    }
+  };
 
   const dynamicStyles = StyleSheet.create({
     safeArea: {
@@ -130,41 +134,42 @@ export default function HomeScreen() {
       shadowRadius: 8,
       elevation: 6,
     },
-    statusLoggedIn: {
-      backgroundColor: colors.primary,
-    },
-    statusNotLoggedIn: {
-      backgroundColor: colors.primary,
-    },
   });
 
   return (
     <View style={[dynamicStyles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+        translucent
+      />
 
+     {/* Saudação do usuário */}
+{isLoggedIn && userName && (
+  <Text style={{ marginLeft: 20, marginTop: 10 }}>
+    <Text style={{ fontSize: 18, color: '#838383ff' }}>Bom dia,{"\n"}</Text>
+    <Text style={{ fontSize: 20, fontWeight: '600', color: colors.text }}>
+      {userName}
+    </Text>
+  </Text>
+)}
 
-      {/* Botão de Usuário Inteligente */}
+      {/* Botão de usuário */}
       <View style={styles.headerButtons}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.userButton}
-          onPress={() => {
-            vibrate();
-            handleUserAction();
-          }}
+          onPress={handleUserAction}
           activeOpacity={1}
         >
-          <FontAwesome5 
-            name={isLoggedIn ? "user-check" : "user-times"} 
-            size={25} 
-            color={colors.primary} 
+          <FontAwesome5
+            name={isLoggedIn ? 'user-check' : 'user-times'}
+            size={25}
+            color={colors.primary}
           />
         </TouchableOpacity>
-        
       </View>
 
-      {/* Conteúdo principal */}
       <View style={styles.scrollContent}>
-        {/* Hero Section com introdução */}
         <View style={styles.heroSection}>
           <View style={dynamicStyles.logoContainer}>
             <Ionicons name="school" size={60} color={colors.primary} />
@@ -175,45 +180,43 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Grid de ícones como home de celular */}
         <View style={styles.appsGrid}>
           {appIcons.map((app) => (
             <Link key={app.id} href={app.route as any} asChild>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.appIcon}
                 onPress={() => vibrate()}
                 activeOpacity={1}
               >
-                 <View style={[styles.iconContainer, { backgroundColor: '#E0E0E0' }]}>
-                   <Ionicons name={app.icon as any} size={32} color={colors.primary} />
-                 </View>
+                <View style={[styles.iconContainer, { backgroundColor: colors.card }]}>
+                  <Ionicons name={app.icon as any} size={32} color={colors.primary} />
+                </View>
                 <Text style={dynamicStyles.appName}>{app.name}</Text>
                 <Text style={dynamicStyles.appDescription}>{app.description}</Text>
               </TouchableOpacity>
             </Link>
           ))}
         </View>
-
       </View>
 
-      {/* BottomNav fixo no final */}
       <BottomNav />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   scrollContent: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 80, // Espaço para os botões de login/cadastro
-    paddingBottom: 20, // Espaço mínimo para o BottomNav
+    paddingTop: 20,
+    paddingBottom: 20,
   },
-  
-  // Header Buttons
+  greeting: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 20,
+    marginTop: 10,
+  },
   headerButtons: {
     position: 'absolute',
     top: 50,
@@ -226,62 +229,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
-  
-  statusContainer: {
-    position: 'absolute',
-    bottom: -3,
-    right: -3,
-    width:40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  statusLoggedIn: {
-    backgroundColor: '#4CAF50',
-  },
-  statusNotLoggedIn: {
-    backgroundColor: '#F44336',
-  },
-
-  // Hero Section
   heroSection: {
     alignItems: 'center',
     paddingVertical: 20,
     paddingHorizontal: 20,
     marginBottom: 15,
   },
-  logoContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  heroSubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-    paddingHorizontal: 10,
-  },
-
-  // Apps Grid - Layout como home de celular
   appsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -290,35 +244,22 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   appIcon: {
-    width: (width - 80) / 3, // 3 colunas com espaçamento
+    width: (width - 80) / 3,
     alignItems: 'center',
     marginBottom: 20,
     paddingVertical: 10,
   },
-   iconContainer: {
-     width: 50,
-     height: 50,
-     borderRadius: 35, // Totalmente redondo
-     backgroundColor: '#E0E0E0', // Cinza claro
-     alignItems: 'center',
-     justifyContent: 'center',
-     marginBottom: 8,
-     shadowColor: '#000',
-     shadowOffset: { width: 0, height: 4 },
-     shadowOpacity: 0.2,
-     shadowRadius: 8,
-     elevation: 6,
-   },
-  appName: {
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 2,
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  appDescription: {
-    fontSize: 11,
-    textAlign: 'center',
-    lineHeight: 14,
-  },
-
 });

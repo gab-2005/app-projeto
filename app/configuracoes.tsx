@@ -1,21 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import {
-  Animated,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
-} from 'react-native';
+import { Animated, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomNav from '../components/BottomNav';
 import { ThemeColor, useAppTheme } from '../components/ThemeContext';
 
-const { width } = Dimensions.get('window');
 
 export default function Configuracoes() {
   const {
@@ -118,6 +108,12 @@ export default function Configuracoes() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <StatusBar 
+        barStyle={isDark ? "light-content" : "dark-content"} 
+        backgroundColor="#fff" // Cor do header estática (branca)
+        translucent={true} 
+      />
+
       {/* Header simples */}
       <View style={[styles.header, { backgroundColor: colors.background }]}>
         <TouchableWithoutFeedback onPress={() => { vibrate(); router.push('/'); }}>

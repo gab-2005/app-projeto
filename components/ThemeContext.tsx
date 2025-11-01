@@ -108,20 +108,19 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
       console.error('Erro ao salvar configurações:', error);
     }
   };
+// Computar cores dinâmicas
+const currentPalette = colorPalettes[settings.themeColor] || colorPalettes['purple'];
+const isDark = settings.themeMode === 'dark';
 
-  // Computar cores dinâmicas
-  const currentPalette = colorPalettes[settings.themeColor];
-  const isDark = settings.themeMode === 'dark';
-  
-  const colors = {
-    primary: currentPalette.primary,
-    primaryDark: currentPalette.primaryDark,
-    primaryLight: currentPalette.primaryLight,
-    background: isDark ? '#141414' : '#F9F9F9',
-    text: isDark ? '#FFFFFF' : '#333333',
-    card: isDark ? '#1E1E1E' : '#FFFFFF',
-    border: isDark ? '#333333' : '#E0E0E0',
-  };
+const colors = {
+  primary: currentPalette.primary,
+  primaryDark: currentPalette.primaryDark,
+  primaryLight: currentPalette.primaryLight,
+  background: isDark ? '#141414' : '#F9F9F9',
+  text: isDark ? '#FFFFFF' : '#333333',
+  card: isDark ? '#1E1E1E' : '#FFFFFF',
+  border: isDark ? '#333333' : '#E0E0E0',
+};
 
   // Debug: Log das cores quando mudam
   console.log('Theme updated:', { themeColor: settings.themeColor, isDark, colors });
